@@ -1,102 +1,48 @@
-package login
+package handler
 
 import (
-    "net/http"
-	"encoding/json"
 	"fmt"
-	"context"
-	"Red_Pocket_Game_Server/db/sqlc"
-	"database/sql"
-	_"github.com/lib/pq"
-	"io/ioutil"
-)
+	"net/http"
 
-// temporary
-const (
-	dbDriver = "postgres"
-	dbSource = "postgresql://root:admin123@localhost:5432/red_pocket_game?sslmode=disable"
+	"github.com/gin-gonic/gin"
 )
 
 type LoginData struct {
-    Username string `json:"username"`
-    Password string `json:"password"`
+	Username string `json:"username"`
+	Password string `json:"password"`
 }
 
-func LoginHandler(w http.ResponseWriter, r *http.Request) {
-	fmt.Println("in the LoginHandler")
+// Login input data
+type loginRequest struct {
+	Username string `json:"username" binding:"required"`
+	Password string `json:"password" binding:"required"`
+}
 
-    // Parsing incoming data
-	var loginData LoginData
-	decoder := json.NewDecoder(r.Body)
-	if err := decoder.Decode(&loginData); err != nil {
-		fmt.Println("decode error")
+func (server *Server) loginHandler(ctx *gin.Context) {
+	var req loginRequest
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		ctx.JSON(http.StatusBadRequest, errorResponse(err))
 		return
 	}
 
-	body, err := ioutil.ReadAll(r.Body)
-	fmt.Println("Request Body:", string(body))
-    username := loginData.Username
-    password := loginData.Password
+	username := req.Username
+	password := req.Password
+	// temporary
 	fmt.Println("password=" + password)
 	fmt.Println("username=" + username)
-	// Establishing a database connection
-	conn, err := sql.Open(dbDriver, dbSource)
+
+	account, err := server.store.GetAccountByName(ctx, username)
 	if err != nil {
-		fmt.Println("database error")
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 		return
 	}
 
-	queries := db.New(conn);  //Create an Queries structure instance
-
-    // Execute validation logic
-	account, err := queries.GetAccountByName(context.Background(), username)  //Calling the GetAccountByName method
-
-	if err == nil {
-		// Handle success
-		fmt.Println("query success")
-		
-			if account.Password == password {
-				fmt.Println("password right")
-				successResponse := map[string]interface{}{
-					"message": "Login success",
-					}
-				jsonResponse, err := json.Marshal(successResponse)  //Convert map to JSON format using encoding/JSON
-				if err != nil {
-					http.Error(w, "JSON encoding error", http.StatusInternalServerError)
-					return
-				}
-				w.Header().Set("Content-Type", "application/json")
-				w.WriteHeader(http.StatusOK)
-				w.Write(jsonResponse)
-			} else {
-				fmt.Println("password wrong")
-				successResponse := map[string]interface{}{
-					"message": "Login failed",
-					}
-				jsonResponse, err := json.Marshal(successResponse)
-				if err != nil {
-					http.Error(w, "JSON encoding error", http.StatusInternalServerError)
-					return
-				}
-				w.Header().Set("Content-Type", "application/json")
-				w.WriteHeader(http.StatusUnauthorized)
-				w.Write(jsonResponse)
-			}
+	if account.Password == password {
+		fmt.Println("password right")
+		ctx.JSON(http.StatusOK, account)
 	} else {
-		// Handle error
-		fmt.Println("query error")
-		errorResponse := map[string]interface{}{
-			"error": "query error",
-		}
-		jsonResponse, err := json.Marshal(errorResponse)
-		if err != nil {
-			http.Error(w, "JSON encoding error", http.StatusInternalServerError)
-			return
-		}
-		
-		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(http.StatusUnauthorized)
-		w.Write(jsonResponse)
+		fmt.Println("password wrong")
+		ctx.JSON(http.StatusUnauthorized, commonResponse("username & password denied"))
 	}
-	
+
 }
