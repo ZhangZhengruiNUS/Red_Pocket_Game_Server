@@ -251,21 +251,45 @@ This command will execute the SQL scripts in the latest **0XXXXX_init_schema.up.
 
 ## 3. Development instruction
 
-### 3.1 Server Development
+### 3.1 IDE-VSCode
 
-#### 3.1.1 Install Go
+_Recommend using VSCode, other IDE is also acceptable_
+
+Recommended installation extensions: Go
+
+### 3.2 Server Development
+
+#### 3.2.1 Basic
+
+- Install Go
 
 ```bash
 sudo snap install go --channel=1.18/stable
 ```
 
-#### 3.1.2 Install sqlc
+- Install godef (optional)
+
+Code Navigation Tools
+
+```bash
+go get -u github.com/rogpeppe/godef
+```
+
+- Install gopls (optional)
+
+Intelligent perception and code navigation
+
+```bash
+go get -u golang.org/x/tools/gopls
+```
+
+- Install sqlc
 
 ```bash
 sudo snap install sqlc --channel=stable/1.22.0
 ```
 
-#### 3.1.3 Start project
+#### 3.2.2 Run project
 
 navigate to the project root directory and use the following commands
 
@@ -287,8 +311,22 @@ Use a browser or download the Postman tool for service verification
 
 ![verify example](img/5249398125634204d8c40607c285935.png)
 
-### 3.2 Database
+#### 3.2.3 Devlopment
 
-### 3.3 Test
+##### 3.2.3.1 Router
+
+When you want to add a new route, modify "NewServer" function in "handlers/server.go"
+
+![server.go example](img/1697479547897.png)
+
+##### 3.2.3.2 service
+
+When you want to add a service in a new field, add a file under "handlers"
+
+![add new service](img/1697479982877.png)
+
+### 3.3 Database
+
+### 3.4 Test
 
 ## 4. CICD
