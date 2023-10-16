@@ -130,7 +130,7 @@ go run main.go
 使用PostgreSQL数据库
 _相较于MySQL，支持更多数据类型、更强大的扩展性和并发性_
 
-使用dbdiagram.io作为数据库辅助设计工具
+使用 <https://dbdiagram.io> 作为数据库辅助设计工具
 
 使用DBeaver作为数据库管理工具
 
@@ -140,7 +140,7 @@ _在WSL创建PostgreSQL的Docker Container_
 
 #### 3.1.1 下载docker image
 
-在 hub.docker.com 中搜索postgres，查看最新的image版本
+在 <https://hub.docker.com> 中搜索postgres，查看最新的image版本
 
 ![hub.docker.com](img/1697287476841.png)
 
