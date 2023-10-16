@@ -3,7 +3,7 @@
 >**Recommended development OS version: Ubuntu 22.04.3 LTS**
 **For other OS, such as MacOS, some details may be different, please use Google/Chatgpt to solve it**
 
-![Backend Development Pattern](img/design_pic-1.jpg)
+![Backend Development Pattern](img/design_pic2.jpg)
 
 [Go_Backend_Devlopment_Note](Go_Backend_Devlopment_Note.md) has my entire project learning process as a reference
 
