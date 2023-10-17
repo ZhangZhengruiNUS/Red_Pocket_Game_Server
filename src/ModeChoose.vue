@@ -16,9 +16,8 @@ let WarehousePath = ref("/WareHouse/")
 
     <el-button-group class="choose">
       <router-link class="choosebutton" to="/Game">start game</router-link>
-      <button class="choosebutton">go store</button>
+      <router-link class="choosebutton" to="/store">go store</router-link>
       <router-link class="choosebutton" :to="{path: WarehousePath + $route.params.username}">my warehouse</router-link>
-      <button class="choosebutton" @click="">turn table</button>
       <!--      <a href="#/StartPage">hello</a>-->
       <router-link class="choosebutton" :to="LogOutPath">log out</router-link>
     </el-button-group>
