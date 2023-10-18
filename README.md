@@ -302,8 +302,11 @@ go mod download
 - Run project
 
 ```bash
-go run main.go
+make server
 ```
+
+This will trigger the instruction corresponding to "createdb" in the Makefile:
+>go run main.go
 
 - Verify
 
@@ -326,6 +329,68 @@ When you want to add a service in a new field, add a file under "handlers"
 ![add new service](img/1697479982877.png)
 
 ### 3.3 Database
+
+>In this way, every change to the database structure is recorded in detail and can be easily applied or rolled back.
+
+when you want to change the structure of the tables
+
+- in the terminal, navigate to the project root directory and use the following commands
+
+```bash
+make migratecreate name=migration_name
+```
+
+_describe the changes you want to make in the tables in the "name" parameter_
+This will trigger the instruction corresponding to "migratecreate" in the Makefile:
+>migrate create -ext sql -dir db/migrations -seq $(name)
+
+This command will generate **0XXXXX_migration_name.up.sql** & **0XXXXX_migration_name.down.sql** file under the Red_Pocket_Game_Server/db/migration (the serail number will automatically increase)
+
+- write the difference script in the 0XXXXX_migration_name.up.sql file and write rollback scripts in the 0XXXXX_migration_name.up.sql
+_if the changes are quite significant, you can try to use some database compare tools to automatically generate the scripts_
+
+>**Important: Do consider the impact of these changes on existing data**
+
+- in the terminal, navigate to the project root directory and use the following commands to apply the changes
+
+```bash
+make migrateup
+```
+
+if you want to rollback the changes, use the following commands
+
+```bash
+make migratedown
+```
+
+After you run the command, if there's any mistake in the scripts, the migration will stop and when you run the migraion command again, it will probably show the error message:
+>error: Dirty database version 1. Fix and force version.
+
+This is because before the migration runs, each database will be set with a dirty flag, if the migration fails, the dirty state will persist. This will prevent future migration operations.
+You can update the change the version of the database into the lastest version forcefully to solve this, use the following commands
+
+```bash
+make migrateforce version=latest version number
+```
+
+_put the latest version number in the "version" parameter_
+This will trigger the instruction corresponding to "migrateforce" in the Makefile:
+>migrate -path db/migration -database "postgresql://root:admin123@localhost:5432/red_pocket_game?sslmode=disable" force $(version)
+
+Then you remove the dirty flag, you can continue the migration operations.
+
+- check if your "db/query/table.sql" need to change
+
+If you make some changes in the files
+In the terminal, navigate to the project root directory and use the following commands to apply the changes
+
+```bash
+make sqlc
+```
+
+this will regenerate the affected files under "./db/sqlc"
+
+![account.sql.go](img/1697375254302.png)
 
 ### 3.4 Test
 
