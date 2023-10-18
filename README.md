@@ -94,7 +94,17 @@ _All branches will be listed and marked with * next to the current branch_
 git checkout my-work
 ```
 
-- When completing this stage of code writing, use the following command to add your changes to the local staging area
+- When completing this stage of code writing
+
+Use the following command to get latest code on main branch **(Important)**
+_Please do this frequently to ensure your code has the latest version of the main branch_
+
+```bash
+git fetch origin
+git merge origin/main
+```
+
+If there's no more modification, use the following command to add your changes to the local staging area
 
 ```bash
 git add .
@@ -116,12 +126,12 @@ git push origin my-work
 
 - Pull request to merge branch
 
->Enter the GitHub repository page, open the Pull Request page, Click the "New Pull Request" button
-Select the branch to merge
-Compare changes
-Fill in the modified information
-Click the "Create Pull Request" button
-Approve and merge the pull request on your own
+>(1) Enter the GitHub repository page, open the Pull Request page, Click the "New Pull Request" button
+(2) Select the branch to merge
+(3) Compare changes
+(4) Fill in the modified information
+(5) Click the "Create Pull Request" button
+(6) Approve and merge the pull request on your own
 
 #### 1.3.2 Directly handle small changes in the main branch
 
@@ -143,13 +153,6 @@ git pull origin main
 
 ```bash
 git add .
-```
-
-- Before submitting, make sure again that your branch is up to date **(Important)**
-
-```bash
-git checkout main
-git pull origin main
 ```
 
 - Submit your changes using the following command
