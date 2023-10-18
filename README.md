@@ -68,105 +68,6 @@ git clone git@github.com:ZhangZhengruiNUS/Red_Pocket_Game_Server.git
 
 _If using the HTTP protocol, please modify the above command_
 
-#### 1.3 Use Git to start team development
-
->_You can also use the git shortcut button in the IDE, as long as you ensure that your actions are correct_
-
-#### 1.3.1 Use branch to handle major changes
-
-- When you want to start your current work for the first time, please create a new branch, and it is recommended to summarize and name it with the approximate work you will complete this time.
-
-```bash
-git checkout -b my-work
-```
-
-- If you are unsure of the current branch, please use the  following command to confirm
-
-```bash
-git branch
-```
-
-_All branches will be listed and marked with * next to the current branch_
-
-- If the current branch is not the feature/my feature branch you created you are preparing to write code, please use the following command to switch to that branch
-
-```bash
-git checkout my-work
-```
-
-- When completing this stage of code writing
-
-Use the following command to get latest code on main branch **(Important)**
-_Please do this frequently to ensure your code has the latest version of the main branch_
-
-```bash
-git fetch origin
-git merge origin/main
-```
-
-If there's no more modification, use the following command to add your changes to the local staging area
-
-```bash
-git add .
-```
-
-_This will add all modified files to the staging area. If you only want to add specific files, you can Replace "." with the file name._
-
-- Submit your changes using the following command
-
-```bash
-git commit -m "A brief description of the work"
-```
-
-- Push to remote repository
-
-```bash
-git push origin my-work
-```
-
-- Pull request to merge branch
-
->(1) Enter the GitHub repository page, open the Pull Request page, Click the "New Pull Request" button
-(2) Select the branch to merge
-(3) Compare changes
-(4) Fill in the modified information
-(5) Click the "Create Pull Request" button
-(6) Approve and merge the pull request on your own
-
-#### 1.3.2 Directly handle small changes in the main branch
-
->_Be cautious when making modifications on the main branch. Ensure that no other person is making changes that conflict with your changes at the same time._
-
-- First, make sure you are on the main branch
-
-```bash
-git checkout main
-```
-
-- Get the latest code **(Important)**
-
-```bash
-git pull origin main
-```
-
-- When completing modification, use the following command to add your changes to the local staging area
-
-```bash
-git add .
-```
-
-- Submit your changes using the following command
-
-```bash
-git commit -m "A brief description of the work"
-```
-
-- Push to remote repository
-
-```bash
-git push origin main
-```
-
 ## 2. Docker & Postgresql
 
 ### 2.1 Install Docker
@@ -252,17 +153,16 @@ This command will execute the SQL scripts in the latest **0XXXXX_init_schema.up.
 
 ![init_schema.up.sql](img/1697432658910.png)
 
-## 3. Development instruction
+## 3. Development Instruction
 
-### 3.1 IDE-VSCode
+### 3.1 Preparation
 
-_Recommend using VSCode, other IDE is also acceptable_
+#### 3.1.1 IDE
 
+Recommend to use VSCode, other IDE is also acceptable
 Recommended installation extensions: Go
 
-### 3.2 Server Development
-
-#### 3.2.1 Basic
+#### 3.1.2 Component Installation
 
 - Install Go
 
@@ -292,7 +192,118 @@ go get -u golang.org/x/tools/gopls
 sudo snap install sqlc --channel=stable/1.22.0
 ```
 
-#### 3.2.2 Run project
+### 3.2 Common rules
+
+- Use CamelCase to name variable, like this:
+
+>userName, inventoryId
+
+- Write more comments to show indicate the work of the regions, like this:
+
+![comments example](img/1697648283943.jpg)
+
+### 3.3 Use Git to start team development
+
+>_You can also use the git shortcut button in the IDE, as long as you ensure that your actions are correct_
+
+#### 3.3.1 Use branch to handle major changes
+
+- When you want to start your current work for the first time, please create a new branch, and it is recommended to summarize and name it with the approximate work you will complete this time.
+
+```bash
+git checkout -b my-work
+```
+
+- If you are unsure of the current branch, please use the  following command to confirm
+
+```bash
+git branch
+```
+
+_All branches will be listed and marked with * next to the current branch_
+
+- If the current branch is not the feature/my feature branch you created you are preparing to write code, please use the following command to switch to that branch
+
+```bash
+git checkout my-work
+```
+
+- When completing this stage of code writing
+
+Use the following command to get latest code on main branch **(Important)**
+_Please do this frequently to ensure your code has the latest version of the main branch_
+
+```bash
+git fetch origin
+git merge origin/main
+```
+
+If there's no more modification, use the following command to add your changes to the local staging area
+
+```bash
+git add .
+```
+
+_This will add all modified files to the staging area. If you only want to add specific files, you can Replace "." with the file name._
+
+- Submit your changes using the following command
+
+```bash
+git commit -m "A brief description of the work"
+```
+
+- Push to remote repository
+
+```bash
+git push origin my-work
+```
+
+- Pull request to merge branch
+
+>a. Enter the GitHub repository page, open the Pull Request page, Click the "New Pull Request" button
+b. Select the branch to merge
+c. Compare changes
+d. Fill in the modified information
+e. Click the "Create Pull Request" button
+f. Approve and merge the pull request on your own
+
+#### 3.3.2 Directly handle small changes in the main branch
+
+>_Be cautious when making modifications on the main branch. Ensure that no other person is making changes that conflict with your changes at the same time._
+
+- First, make sure you are on the main branch
+
+```bash
+git checkout main
+```
+
+- Get the latest code **(Important)**
+
+```bash
+git pull origin main
+```
+
+- When completing modification, use the following command to add your changes to the local staging area
+
+```bash
+git add .
+```
+
+- Submit your changes using the following command
+
+```bash
+git commit -m "A brief description of the work"
+```
+
+- Push to remote repository
+
+```bash
+git push origin main
+```
+
+### 3.4 Server Development
+
+#### 3.4.1 Run project
 
 navigate to the project root directory and use the following commands
 
@@ -313,31 +324,65 @@ This will trigger the instruction corresponding to "createdb" in the Makefile:
 
 - Verify
 
-Use a browser or download the Postman tool for service verification
+Download the Postman tool for service verification
 
 ![verify example](img/5249398125634204d8c40607c285935.png)
 
-#### 3.2.3 Devlopment
+#### 3.4.2 Devlopment
 
-##### 3.2.3.1 Router
+##### 3.4.2.1 Router
 
 When you want to add a new route, modify "NewServer" function in "handlers/server.go"
 
 ![server.go example](img/1697479547897.png)
 
-##### 3.2.3.2 service
+##### 3.4.2.2 Service
 
 When you want to add a service in a new field, add a file under "handlers"
 
 ![add new service](img/1697479982877.png)
 
-### 3.3 Database
+##### 3.4.2.3 Sql
+
+(1) Non-Transactions
+
+>Only in the following two cases, you can use this method:
+>a. Change(Create/Update/Delete) only one table with only one record
+>b. Only read tables
+
+- Write the sqlc scripts in the "db/query/table_name.sql"(follow the syntax of sqlc), like this:
+_(ref: <https://docs.sqlc.dev/en/stable/tutorials/getting-started-postgresql.html>)_
+
+![sqlc scripts example](img/1697650119551.jpg)
+
+>-- name: GoFunctionName -> The Go function name you want generate automatically
+>:one -> Return only one record
+>:many -> Return some records
+>:exec -> Return zero record
+
+- in the terminal, navigate to the project root directory and use the following commands
+
+```bash
+make sqlc
+```
+
+This will generate the affected files under "./db/sqlc", then you can find the sqlc sctipts corresponding Go functions there and use them in the handler services
+
+(2) Transactions
+
+- Change(Create/Update/Delete) only one table with only one record
+
+>In the following two cases, but not only the two cases, you can use this method:
+>a. When you want to change(Create/Update/Delete) more than one table
+>b. When you want to change(Create/Update/Delete) one table with more than one record
+
+### 3.4 Database
 
 >In this way, every change to the database structure is recorded in detail and can be easily applied or rolled back.
 
-when you want to change the structure of the tables
+When you want to change the structure of the tables
 
-- in the terminal, navigate to the project root directory and use the following commands
+- In the terminal, navigate to the project root directory and use the following commands
 
 ```bash
 make migratecreate name=migration_name
@@ -349,18 +394,18 @@ This will trigger the instruction corresponding to "migratecreate" in the Makefi
 
 This command will generate **0XXXXX_migration_name.up.sql** & **0XXXXX_migration_name.down.sql** file under the Red_Pocket_Game_Server/db/migration (the serail number will automatically increase)
 
-- write the difference script in the 0XXXXX_migration_name.up.sql file and write rollback scripts in the 0XXXXX_migration_name.up.sql
+- Write the difference script in the 0XXXXX_migration_name.up.sql file and write rollback scripts in the 0XXXXX_migration_name.up.sql
 _if the changes are quite significant, you can try to use some database compare tools to automatically generate the scripts_
 
 >**Important: Do consider the impact of these changes on existing data**
 
-- in the terminal, navigate to the project root directory and use the following commands to apply the changes
+- In the terminal, navigate to the project root directory and use the following commands to apply the changes
 
 ```bash
 make migrateup
 ```
 
-if you want to rollback the changes, use the following commands
+If you want to rollback the changes, use the following commands
 
 ```bash
 make migratedown
@@ -391,7 +436,7 @@ In the terminal, navigate to the project root directory and use the following co
 make sqlc
 ```
 
-this will regenerate the affected files under "./db/sqlc"
+This will regenerate the affected files under "./db/sqlc"
 
 ![account.sql.go](img/1697375254302.png)
 
