@@ -13,11 +13,17 @@ migrateup:
 migratedown:
 	migrate -path db/migration -database "postgresql://root:admin123@localhost:5432/red_pocket_game?sslmode=disable" -verbose down
 
+migratecreate:
+	migrate create -ext sql -dir db/migrations -seq $(name)
+
+migrateforce:
+	migrate -path db/migration -database "postgresql://root:admin123@localhost:5432/red_pocket_game?sslmode=disable" force $(version)
+
 sqlc:
 	sqlc generate
 
 server:
 	go run main.go
 
-.PHONY: postgres createdb dropdb migrateup migratedown sqlc server
+.PHONY: postgres createdb dropdb migrateup migratedown migratecreate migrateforce sqlc server
 
