@@ -12,64 +12,82 @@ import (
 const createItem = `-- name: CreateItem :one
 INSERT INTO items (
   item_name,
-  item_price,
+  describe,
+  pic_path,
+  price,
   creator_id
 ) VALUES (
-  $1, $2, $3
+  $1, $2, $3, $4, $5
 )
-RETURNING id, item_name, item_price, create_time, creator_id
+RETURNING item_id, item_name, describe, pic_path, price, reviser_id, revise_time, creator_id, create_time
 `
 
 type CreateItemParams struct {
 	ItemName  string `json:"itemName"`
-	ItemPrice int32  `json:"itemPrice"`
+	Describe  string `json:"describe"`
+	PicPath   string `json:"picPath"`
+	Price     int32  `json:"price"`
 	CreatorID int64  `json:"creatorId"`
 }
 
 func (q *Queries) CreateItem(ctx context.Context, arg CreateItemParams) (Item, error) {
-	row := q.queryRow(ctx, q.createItemStmt, createItem, arg.ItemName, arg.ItemPrice, arg.CreatorID)
+	row := q.queryRow(ctx, q.createItemStmt, createItem,
+		arg.ItemName,
+		arg.Describe,
+		arg.PicPath,
+		arg.Price,
+		arg.CreatorID,
+	)
 	var i Item
 	err := row.Scan(
-		&i.ID,
+		&i.ItemID,
 		&i.ItemName,
-		&i.ItemPrice,
-		&i.CreateTime,
+		&i.Describe,
+		&i.PicPath,
+		&i.Price,
+		&i.ReviserID,
+		&i.ReviseTime,
 		&i.CreatorID,
+		&i.CreateTime,
 	)
 	return i, err
 }
 
 const deleteItem = `-- name: DeleteItem :exec
 DELETE FROM items
-WHERE id = $1
+WHERE item_id = $1
 `
 
-func (q *Queries) DeleteItem(ctx context.Context, id int64) error {
-	_, err := q.exec(ctx, q.deleteItemStmt, deleteItem, id)
+func (q *Queries) DeleteItem(ctx context.Context, itemID int64) error {
+	_, err := q.exec(ctx, q.deleteItemStmt, deleteItem, itemID)
 	return err
 }
 
 const getItem = `-- name: GetItem :one
-SELECT id, item_name, item_price, create_time, creator_id FROM items
-WHERE id = $1 LIMIT 1
+SELECT item_id, item_name, describe, pic_path, price, reviser_id, revise_time, creator_id, create_time FROM items
+WHERE item_id = $1 LIMIT 1
 `
 
-func (q *Queries) GetItem(ctx context.Context, id int64) (Item, error) {
-	row := q.queryRow(ctx, q.getItemStmt, getItem, id)
+func (q *Queries) GetItem(ctx context.Context, itemID int64) (Item, error) {
+	row := q.queryRow(ctx, q.getItemStmt, getItem, itemID)
 	var i Item
 	err := row.Scan(
-		&i.ID,
+		&i.ItemID,
 		&i.ItemName,
-		&i.ItemPrice,
-		&i.CreateTime,
+		&i.Describe,
+		&i.PicPath,
+		&i.Price,
+		&i.ReviserID,
+		&i.ReviseTime,
 		&i.CreatorID,
+		&i.CreateTime,
 	)
 	return i, err
 }
 
 const listItems = `-- name: ListItems :many
-SELECT id, item_name, item_price, create_time, creator_id FROM items
-ORDER BY id
+SELECT item_id, item_name, describe, pic_path, price, reviser_id, revise_time, creator_id, create_time FROM items
+ORDER BY item_id
 LIMIT $1
 OFFSET $2
 `
@@ -89,11 +107,15 @@ func (q *Queries) ListItems(ctx context.Context, arg ListItemsParams) ([]Item, e
 	for rows.Next() {
 		var i Item
 		if err := rows.Scan(
-			&i.ID,
+			&i.ItemID,
 			&i.ItemName,
-			&i.ItemPrice,
-			&i.CreateTime,
+			&i.Describe,
+			&i.PicPath,
+			&i.Price,
+			&i.ReviserID,
+			&i.ReviseTime,
 			&i.CreatorID,
+			&i.CreateTime,
 		); err != nil {
 			return nil, err
 		}
@@ -106,22 +128,4 @@ func (q *Queries) ListItems(ctx context.Context, arg ListItemsParams) ([]Item, e
 		return nil, err
 	}
 	return items, nil
-}
-
-const updateItem = `-- name: UpdateItem :exec
-UPDATE items
-  set item_name = $2,
-  item_price = $3
-WHERE id = $1
-`
-
-type UpdateItemParams struct {
-	ID        int64  `json:"id"`
-	ItemName  string `json:"itemName"`
-	ItemPrice int32  `json:"itemPrice"`
-}
-
-func (q *Queries) UpdateItem(ctx context.Context, arg UpdateItemParams) error {
-	_, err := q.exec(ctx, q.updateItemStmt, updateItem, arg.ID, arg.ItemName, arg.ItemPrice)
-	return err
 }

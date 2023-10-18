@@ -31,7 +31,7 @@ func (server *Server) loginHandler(ctx *gin.Context) {
 	fmt.Println("password=" + password)
 	fmt.Println("username=" + username)
 
-	account, err := server.store.GetAccountByName(ctx, username)
+	account, err := server.store.GetUserByName(ctx, username)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 		return

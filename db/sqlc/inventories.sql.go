@@ -11,26 +11,29 @@ import (
 
 const createInventory = `-- name: CreateInventory :one
 INSERT INTO inventories (
-  account_id,
-  item_id
+  user_id,
+  item_id,
+  quantity
 ) VALUES (
-  $1, $2
+  $1, $2, $3
 )
-RETURNING id, account_id, item_id, create_time
+RETURNING inventory_id, user_id, item_id, quantity, create_time
 `
 
 type CreateInventoryParams struct {
-	AccountID int64 `json:"accountId"`
-	ItemID    int64 `json:"itemId"`
+	UserID   int64 `json:"userId"`
+	ItemID   int64 `json:"itemId"`
+	Quantity int32 `json:"quantity"`
 }
 
 func (q *Queries) CreateInventory(ctx context.Context, arg CreateInventoryParams) (Inventory, error) {
-	row := q.queryRow(ctx, q.createInventoryStmt, createInventory, arg.AccountID, arg.ItemID)
+	row := q.queryRow(ctx, q.createInventoryStmt, createInventory, arg.UserID, arg.ItemID, arg.Quantity)
 	var i Inventory
 	err := row.Scan(
-		&i.ID,
-		&i.AccountID,
+		&i.InventoryID,
+		&i.UserID,
 		&i.ItemID,
+		&i.Quantity,
 		&i.CreateTime,
 	)
 	return i, err
@@ -38,34 +41,35 @@ func (q *Queries) CreateInventory(ctx context.Context, arg CreateInventoryParams
 
 const deleteInventory = `-- name: DeleteInventory :exec
 DELETE FROM inventories
-WHERE id = $1
+WHERE inventory_id = $1
 `
 
-func (q *Queries) DeleteInventory(ctx context.Context, id int64) error {
-	_, err := q.exec(ctx, q.deleteInventoryStmt, deleteInventory, id)
+func (q *Queries) DeleteInventory(ctx context.Context, inventoryID int64) error {
+	_, err := q.exec(ctx, q.deleteInventoryStmt, deleteInventory, inventoryID)
 	return err
 }
 
 const getInventory = `-- name: GetInventory :one
-SELECT id, account_id, item_id, create_time FROM inventories
-WHERE id = $1 LIMIT 1
+SELECT inventory_id, user_id, item_id, quantity, create_time FROM inventories
+WHERE inventory_id = $1 LIMIT 1
 `
 
-func (q *Queries) GetInventory(ctx context.Context, id int64) (Inventory, error) {
-	row := q.queryRow(ctx, q.getInventoryStmt, getInventory, id)
+func (q *Queries) GetInventory(ctx context.Context, inventoryID int64) (Inventory, error) {
+	row := q.queryRow(ctx, q.getInventoryStmt, getInventory, inventoryID)
 	var i Inventory
 	err := row.Scan(
-		&i.ID,
-		&i.AccountID,
+		&i.InventoryID,
+		&i.UserID,
 		&i.ItemID,
+		&i.Quantity,
 		&i.CreateTime,
 	)
 	return i, err
 }
 
 const listInventories = `-- name: ListInventories :many
-SELECT id, account_id, item_id, create_time FROM inventories
-ORDER BY id
+SELECT inventory_id, user_id, item_id, quantity, create_time FROM inventories
+ORDER BY inventory_id
 LIMIT $1
 OFFSET $2
 `
@@ -85,9 +89,10 @@ func (q *Queries) ListInventories(ctx context.Context, arg ListInventoriesParams
 	for rows.Next() {
 		var i Inventory
 		if err := rows.Scan(
-			&i.ID,
-			&i.AccountID,
+			&i.InventoryID,
+			&i.UserID,
 			&i.ItemID,
+			&i.Quantity,
 			&i.CreateTime,
 		); err != nil {
 			return nil, err

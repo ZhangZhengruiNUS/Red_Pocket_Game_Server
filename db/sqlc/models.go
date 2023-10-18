@@ -5,29 +5,58 @@
 package db
 
 import (
+	"database/sql"
 	"time"
 )
 
-type Account struct {
-	ID       int64  `json:"id"`
-	Username string `json:"username"`
-	Password string `json:"password"`
-	// 0-normal user 1-admin
-	RoleType   int32     `json:"roleType"`
-	CreateTime time.Time `json:"createTime"`
+type GameDifficultySetting struct {
+	DiffLv       int32         `json:"diffLv"`
+	AwardDensity int32         `json:"awardDensity"`
+	EnemyDensity int32         `json:"enemyDensity"`
+	ReviserID    sql.NullInt64 `json:"reviserId"`
+	ReviseTime   sql.NullTime  `json:"reviseTime"`
+	CreatorID    int64         `json:"creatorId"`
+	CreateTime   time.Time     `json:"createTime"`
 }
 
 type Inventory struct {
-	ID         int64     `json:"id"`
-	AccountID  int64     `json:"accountId"`
-	ItemID     int64     `json:"itemId"`
-	CreateTime time.Time `json:"createTime"`
+	InventoryID int64     `json:"inventoryId"`
+	UserID      int64     `json:"userId"`
+	ItemID      int64     `json:"itemId"`
+	Quantity    int32     `json:"quantity"`
+	CreateTime  time.Time `json:"createTime"`
 }
 
 type Item struct {
-	ID         int64     `json:"id"`
-	ItemName   string    `json:"itemName"`
-	ItemPrice  int32     `json:"itemPrice"`
+	ItemID     int64         `json:"itemId"`
+	ItemName   string        `json:"itemName"`
+	Describe   string        `json:"describe"`
+	PicPath    string        `json:"picPath"`
+	Price      int32         `json:"price"`
+	ReviserID  sql.NullInt64 `json:"reviserId"`
+	ReviseTime sql.NullTime  `json:"reviseTime"`
+	CreatorID  int64         `json:"creatorId"`
+	CreateTime time.Time     `json:"createTime"`
+}
+
+type Prize struct {
+	PrizeID    int64         `json:"prizeId"`
+	PrizeName  string        `json:"prizeName"`
+	PicPath    string        `json:"picPath"`
+	Weight     int32         `json:"weight"`
+	ReviserID  sql.NullInt64 `json:"reviserId"`
+	ReviseTime sql.NullTime  `json:"reviseTime"`
+	CreatorID  int64         `json:"creatorId"`
+	CreateTime time.Time     `json:"createTime"`
+}
+
+type User struct {
+	UserID   int64  `json:"userId"`
+	UserName string `json:"userName"`
+	Password string `json:"password"`
+	Credit   int32  `json:"credit"`
+	Coupon   int32  `json:"coupon"`
+	// 0-normal user 1-admin
+	RoleType   int32     `json:"roleType"`
 	CreateTime time.Time `json:"createTime"`
-	CreatorID  int64     `json:"creatorId"`
 }

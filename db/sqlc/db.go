@@ -24,17 +24,14 @@ func New(db DBTX) *Queries {
 func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 	q := Queries{db: db}
 	var err error
-	if q.createAccountStmt, err = db.PrepareContext(ctx, createAccount); err != nil {
-		return nil, fmt.Errorf("error preparing query CreateAccount: %w", err)
-	}
 	if q.createInventoryStmt, err = db.PrepareContext(ctx, createInventory); err != nil {
 		return nil, fmt.Errorf("error preparing query CreateInventory: %w", err)
 	}
 	if q.createItemStmt, err = db.PrepareContext(ctx, createItem); err != nil {
 		return nil, fmt.Errorf("error preparing query CreateItem: %w", err)
 	}
-	if q.deleteAuthorStmt, err = db.PrepareContext(ctx, deleteAuthor); err != nil {
-		return nil, fmt.Errorf("error preparing query DeleteAuthor: %w", err)
+	if q.createUserStmt, err = db.PrepareContext(ctx, createUser); err != nil {
+		return nil, fmt.Errorf("error preparing query CreateUser: %w", err)
 	}
 	if q.deleteInventoryStmt, err = db.PrepareContext(ctx, deleteInventory); err != nil {
 		return nil, fmt.Errorf("error preparing query DeleteInventory: %w", err)
@@ -42,11 +39,8 @@ func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 	if q.deleteItemStmt, err = db.PrepareContext(ctx, deleteItem); err != nil {
 		return nil, fmt.Errorf("error preparing query DeleteItem: %w", err)
 	}
-	if q.getAccountByIdStmt, err = db.PrepareContext(ctx, getAccountById); err != nil {
-		return nil, fmt.Errorf("error preparing query GetAccountById: %w", err)
-	}
-	if q.getAccountByNameStmt, err = db.PrepareContext(ctx, getAccountByName); err != nil {
-		return nil, fmt.Errorf("error preparing query GetAccountByName: %w", err)
+	if q.deleteUserStmt, err = db.PrepareContext(ctx, deleteUser); err != nil {
+		return nil, fmt.Errorf("error preparing query DeleteUser: %w", err)
 	}
 	if q.getInventoryStmt, err = db.PrepareContext(ctx, getInventory); err != nil {
 		return nil, fmt.Errorf("error preparing query GetInventory: %w", err)
@@ -54,8 +48,11 @@ func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 	if q.getItemStmt, err = db.PrepareContext(ctx, getItem); err != nil {
 		return nil, fmt.Errorf("error preparing query GetItem: %w", err)
 	}
-	if q.listAccountsStmt, err = db.PrepareContext(ctx, listAccounts); err != nil {
-		return nil, fmt.Errorf("error preparing query ListAccounts: %w", err)
+	if q.getUserByIdStmt, err = db.PrepareContext(ctx, getUserById); err != nil {
+		return nil, fmt.Errorf("error preparing query GetUserById: %w", err)
+	}
+	if q.getUserByNameStmt, err = db.PrepareContext(ctx, getUserByName); err != nil {
+		return nil, fmt.Errorf("error preparing query GetUserByName: %w", err)
 	}
 	if q.listInventoriesStmt, err = db.PrepareContext(ctx, listInventories); err != nil {
 		return nil, fmt.Errorf("error preparing query ListInventories: %w", err)
@@ -63,22 +60,14 @@ func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 	if q.listItemsStmt, err = db.PrepareContext(ctx, listItems); err != nil {
 		return nil, fmt.Errorf("error preparing query ListItems: %w", err)
 	}
-	if q.updateAccountPwdStmt, err = db.PrepareContext(ctx, updateAccountPwd); err != nil {
-		return nil, fmt.Errorf("error preparing query UpdateAccountPwd: %w", err)
-	}
-	if q.updateItemStmt, err = db.PrepareContext(ctx, updateItem); err != nil {
-		return nil, fmt.Errorf("error preparing query UpdateItem: %w", err)
+	if q.listUsersStmt, err = db.PrepareContext(ctx, listUsers); err != nil {
+		return nil, fmt.Errorf("error preparing query ListUsers: %w", err)
 	}
 	return &q, nil
 }
 
 func (q *Queries) Close() error {
 	var err error
-	if q.createAccountStmt != nil {
-		if cerr := q.createAccountStmt.Close(); cerr != nil {
-			err = fmt.Errorf("error closing createAccountStmt: %w", cerr)
-		}
-	}
 	if q.createInventoryStmt != nil {
 		if cerr := q.createInventoryStmt.Close(); cerr != nil {
 			err = fmt.Errorf("error closing createInventoryStmt: %w", cerr)
@@ -89,9 +78,9 @@ func (q *Queries) Close() error {
 			err = fmt.Errorf("error closing createItemStmt: %w", cerr)
 		}
 	}
-	if q.deleteAuthorStmt != nil {
-		if cerr := q.deleteAuthorStmt.Close(); cerr != nil {
-			err = fmt.Errorf("error closing deleteAuthorStmt: %w", cerr)
+	if q.createUserStmt != nil {
+		if cerr := q.createUserStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing createUserStmt: %w", cerr)
 		}
 	}
 	if q.deleteInventoryStmt != nil {
@@ -104,14 +93,9 @@ func (q *Queries) Close() error {
 			err = fmt.Errorf("error closing deleteItemStmt: %w", cerr)
 		}
 	}
-	if q.getAccountByIdStmt != nil {
-		if cerr := q.getAccountByIdStmt.Close(); cerr != nil {
-			err = fmt.Errorf("error closing getAccountByIdStmt: %w", cerr)
-		}
-	}
-	if q.getAccountByNameStmt != nil {
-		if cerr := q.getAccountByNameStmt.Close(); cerr != nil {
-			err = fmt.Errorf("error closing getAccountByNameStmt: %w", cerr)
+	if q.deleteUserStmt != nil {
+		if cerr := q.deleteUserStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing deleteUserStmt: %w", cerr)
 		}
 	}
 	if q.getInventoryStmt != nil {
@@ -124,9 +108,14 @@ func (q *Queries) Close() error {
 			err = fmt.Errorf("error closing getItemStmt: %w", cerr)
 		}
 	}
-	if q.listAccountsStmt != nil {
-		if cerr := q.listAccountsStmt.Close(); cerr != nil {
-			err = fmt.Errorf("error closing listAccountsStmt: %w", cerr)
+	if q.getUserByIdStmt != nil {
+		if cerr := q.getUserByIdStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing getUserByIdStmt: %w", cerr)
+		}
+	}
+	if q.getUserByNameStmt != nil {
+		if cerr := q.getUserByNameStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing getUserByNameStmt: %w", cerr)
 		}
 	}
 	if q.listInventoriesStmt != nil {
@@ -139,14 +128,9 @@ func (q *Queries) Close() error {
 			err = fmt.Errorf("error closing listItemsStmt: %w", cerr)
 		}
 	}
-	if q.updateAccountPwdStmt != nil {
-		if cerr := q.updateAccountPwdStmt.Close(); cerr != nil {
-			err = fmt.Errorf("error closing updateAccountPwdStmt: %w", cerr)
-		}
-	}
-	if q.updateItemStmt != nil {
-		if cerr := q.updateItemStmt.Close(); cerr != nil {
-			err = fmt.Errorf("error closing updateItemStmt: %w", cerr)
+	if q.listUsersStmt != nil {
+		if cerr := q.listUsersStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing listUsersStmt: %w", cerr)
 		}
 	}
 	return err
@@ -186,43 +170,39 @@ func (q *Queries) queryRow(ctx context.Context, stmt *sql.Stmt, query string, ar
 }
 
 type Queries struct {
-	db                   DBTX
-	tx                   *sql.Tx
-	createAccountStmt    *sql.Stmt
-	createInventoryStmt  *sql.Stmt
-	createItemStmt       *sql.Stmt
-	deleteAuthorStmt     *sql.Stmt
-	deleteInventoryStmt  *sql.Stmt
-	deleteItemStmt       *sql.Stmt
-	getAccountByIdStmt   *sql.Stmt
-	getAccountByNameStmt *sql.Stmt
-	getInventoryStmt     *sql.Stmt
-	getItemStmt          *sql.Stmt
-	listAccountsStmt     *sql.Stmt
-	listInventoriesStmt  *sql.Stmt
-	listItemsStmt        *sql.Stmt
-	updateAccountPwdStmt *sql.Stmt
-	updateItemStmt       *sql.Stmt
+	db                  DBTX
+	tx                  *sql.Tx
+	createInventoryStmt *sql.Stmt
+	createItemStmt      *sql.Stmt
+	createUserStmt      *sql.Stmt
+	deleteInventoryStmt *sql.Stmt
+	deleteItemStmt      *sql.Stmt
+	deleteUserStmt      *sql.Stmt
+	getInventoryStmt    *sql.Stmt
+	getItemStmt         *sql.Stmt
+	getUserByIdStmt     *sql.Stmt
+	getUserByNameStmt   *sql.Stmt
+	listInventoriesStmt *sql.Stmt
+	listItemsStmt       *sql.Stmt
+	listUsersStmt       *sql.Stmt
 }
 
 func (q *Queries) WithTx(tx *sql.Tx) *Queries {
 	return &Queries{
-		db:                   tx,
-		tx:                   tx,
-		createAccountStmt:    q.createAccountStmt,
-		createInventoryStmt:  q.createInventoryStmt,
-		createItemStmt:       q.createItemStmt,
-		deleteAuthorStmt:     q.deleteAuthorStmt,
-		deleteInventoryStmt:  q.deleteInventoryStmt,
-		deleteItemStmt:       q.deleteItemStmt,
-		getAccountByIdStmt:   q.getAccountByIdStmt,
-		getAccountByNameStmt: q.getAccountByNameStmt,
-		getInventoryStmt:     q.getInventoryStmt,
-		getItemStmt:          q.getItemStmt,
-		listAccountsStmt:     q.listAccountsStmt,
-		listInventoriesStmt:  q.listInventoriesStmt,
-		listItemsStmt:        q.listItemsStmt,
-		updateAccountPwdStmt: q.updateAccountPwdStmt,
-		updateItemStmt:       q.updateItemStmt,
+		db:                  tx,
+		tx:                  tx,
+		createInventoryStmt: q.createInventoryStmt,
+		createItemStmt:      q.createItemStmt,
+		createUserStmt:      q.createUserStmt,
+		deleteInventoryStmt: q.deleteInventoryStmt,
+		deleteItemStmt:      q.deleteItemStmt,
+		deleteUserStmt:      q.deleteUserStmt,
+		getInventoryStmt:    q.getInventoryStmt,
+		getItemStmt:         q.getItemStmt,
+		getUserByIdStmt:     q.getUserByIdStmt,
+		getUserByNameStmt:   q.getUserByNameStmt,
+		listInventoriesStmt: q.listInventoriesStmt,
+		listItemsStmt:       q.listItemsStmt,
+		listUsersStmt:       q.listUsersStmt,
 	}
 }
