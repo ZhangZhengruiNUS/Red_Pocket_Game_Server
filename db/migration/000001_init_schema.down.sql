@@ -1,3 +1,5 @@
 DROP TABLE IF EXISTS inventories;
+DROP TABLE IF EXISTS game_difficulty_settings;
+DROP TABLE IF EXISTS prizes;
 DROP TABLE IF EXISTS items;
-DROP TABLE IF EXISTS accounts;
+DROP TABLE IF EXISTS users;
