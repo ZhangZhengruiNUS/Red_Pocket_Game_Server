@@ -5,12 +5,15 @@ import { createPinia } from 'pinia'
 import ElementPlus from 'element-plus'
 import 'element-plus/dist/index.css'
 import { createVuetify } from 'vuetify'
-import 'vuetify/styles'
+//import 'vuetify/styles'
 import * as components from 'vuetify/components'
 import * as directives from 'vuetify/directives'
 import router from "./router"
 import APP from "./route.vue"
-// import APP from './Login.vue'
+import naive from "naive-ui";
+
+// import axios from "axios";
+// Vue.prototype.$http = axios
 
 const app = createApp(APP)
 
@@ -22,7 +25,7 @@ const vuetify = createVuetify({
 app.use(router)
 app.use(createPinia())
 app.use(vuetify)
-
+app.use(naive);
 app.mount('#app')
 
 

@@ -6,8 +6,6 @@ const Password1 = ref('')
 const Password2 = ref('')
 const unmerrorMessage =ref("Sorry! The username have been taken!")
 const pwderrorMessage =ref("Sorry! The password don't match!")
-const emit = defineEmits(['SignUpResponse'])
-emit("SignUpResponse", Username)
 </script>
 
 <script>

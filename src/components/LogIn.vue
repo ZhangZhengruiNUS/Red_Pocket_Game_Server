@@ -1,30 +1,28 @@
 <script setup>
 import {ref} from "vue";
-import {RouterLink} from "vue-router";
+import router from "@/router";
 
 const Username = ref('')
 const Password = ref('')
 const errorMessage =ref("Sorry! The username and the password don't match!")
 
-const emit = defineEmits(['SignInResponse'])
-emit("SignInResponse", Username)
-</script>
-
-<script>
+function log(){
+  router.push(`/ModeChoose/${Username.value}`)
+}
 </script>
 
 <template>
-  <h2>Sign in</h2>
+  <h2>Log in</h2>
   <br>
   <h4>Continue your exciting fight fight!</h4>
   <br>
   <p> Username: <input v-model="Username" placeholder="Username"></p>
 <!--  <p>{{Username}}</p>-->
-  <p> Password: <input v-model="Password" placeholder="Password"></p>
+  <p> Password: <input type="password" v-model="Password" placeholder="Password"></p>
   <br>
-  <router-link :to="{path: '/ModeChoose/' + Username}">
-    <button class="Signbutton" @click="">Sign in</button>
-  </router-link>
+<!--  <router-link :to="{path: '/ModeChoose/' + Username}">-->
+    <button class="Signbutton" @click="log" is="false">Log in</button>
+<!--  </router-link>-->
   <button class="Signbutton" @click="">Quit</button>
 </template>
 

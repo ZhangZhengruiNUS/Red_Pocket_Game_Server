@@ -18,7 +18,6 @@
   import Info from './Info.vue'
   import CoverBackground from './CoverBackground.vue'
 
-
   export default {
     name: 'GameInterface',
     components: {
@@ -525,6 +524,9 @@
         bottom: 0;
         z-index: 1000;
         background: transparent;
+        background-image: url('./background/bg1.png');
+        background-size: cover; /* Stretch the image to cover the entire background */
+        background-repeat: no-repeat;
     }
     .fly-obj {
             position: absolute;

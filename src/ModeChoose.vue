@@ -1,25 +1,35 @@
 <script setup>
 import {ref} from 'vue'
-import StartPage from './StartPage.vue'
+import router from "@/router";
 
-const username = ref('')
-let LogOutPath = ref("/StartPage")
+const username = router.currentRoute.value.params.username
 
-let WarehousePath = ref("/WareHouse/")
+function goGame(){
+  router.push("/Game")
+}
+function goStore(){
+  router.push("/catalog")
+}
+function goWarehouse(){
+  router.push(`/WareHouse/${username}`)
+}
+function goStart(){
+  router.push("/")
+}
 
 </script>
 
 <template>
   <dev class="base">
-    <h1 class="title">Welcome come Back! {{ $route.params.username }}</h1>
+    <h1 class="title">Welcome come Back! {{ username }}</h1>
     <h3 class="titleChoose">Choose your battle!</h3>
 
     <el-button-group class="choose">
-      <router-link class="choosebutton" to="/Game">start game</router-link>
-      <router-link class="choosebutton" to="/store">go store</router-link>
-      <router-link class="choosebutton" :to="{path: WarehousePath + $route.params.username}">my warehouse</router-link>
+      <button class="choosebutton" @click="goGame">start game</button>
+      <button class="choosebutton" @click="goStore">go store</button>
+      <button class="choosebutton" @click="goWarehouse">my warehouse</button>
       <!--      <a href="#/StartPage">hello</a>-->
-      <router-link class="choosebutton" :to="LogOutPath">log out</router-link>
+      <button class="choosebutton" @click="goStart">log out</button>
     </el-button-group>
   </dev>
 
@@ -29,7 +39,8 @@ let WarehousePath = ref("/WareHouse/")
 
 .base {
   display: flex;
-//flex-flow: column; justify-content: center;
+  flex-flow: column; justify-content: center;
+
   text-align: center;
 }
 
@@ -41,13 +52,16 @@ let WarehousePath = ref("/WareHouse/")
 }
 
 .choose {
+
   position: absolute;
   top: 32%;
   display: flex;
+
   flex-flow: column;
 }
 
 .choosebutton {
+
   height: 60px;
   width: 400px;
   line-height: 36px;
@@ -56,6 +70,6 @@ let WarehousePath = ref("/WareHouse/")
   background: #accbea;
   color: #2c3e50;
   border: 1px solid transparent;
-//border: 1px solid #164bde; padding: 0 10px; margin: 20px;
+  padding: 0 10px; margin: 20px;
 }
 </style>

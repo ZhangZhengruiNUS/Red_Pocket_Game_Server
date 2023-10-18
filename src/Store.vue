@@ -17,11 +17,11 @@
 </template>
 
 <script setup>
-  import { useRouter } from "vue-router";
-  import { productsStore } from "@/stores/products";
+import { useRouter } from "vue-router";
+//import { productsStore } from "@/stores/products";
 
-  const router = useRouter()
-  const store = productsStore()
+const router = useRouter()
+//const store = productsStore()
 </script>
 
 

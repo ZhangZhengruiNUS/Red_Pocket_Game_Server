@@ -1,11 +1,9 @@
 <script setup>
 import {ref} from 'vue'
-import SignIn from './components/SignIn.vue'
+import LogIn from './components/LogIn.vue'
 import SignUp from './components/SignUp.vue'
 
-const picked = ref('Sign in')
-let username = ref("username")
-let password = ref("password")
+const picked = ref('Log In')
 
 function changePicked(choose) {
   picked.value = choose;
@@ -19,18 +17,17 @@ function changePicked(choose) {
     <h1 class="Starttitle">FlyFight</h1>
     <br>
     <button-group class="Startchoose" type="text">
-      <button class="Startchoosebutton" v-on:click="changePicked('Sign in')">Sign in</button>
-      <button class="Startchoosebutton" v-on:click="changePicked('Sign up')">Sign up</button>
+      <button class="Startchoosebutton" v-on:click="changePicked('Log In')">Log In</button>
+      <button class="Startchoosebutton" v-on:click="changePicked('Sign Up')">Sign up</button>
     </button-group>
     <br>
     <sub class="Startsignpage">
-      <SignIn @SignInResponse="(Username) => username = Username" v-if="picked == 'Sign in'"/>
-      <SignUp @SignUpResponse="(Username) => username = Username" v-if="picked == 'Sign up'"/>
+      <LogIn  v-if="picked == 'Log In'"/>
+      <SignUp v-if="picked == 'Sign Up'"/>
     </sub>
 
 <!--    <p @SignUpResponse="(Username) => username = Username"></p>-->
 <!--    <p @SignInResponse="(Username) => username = Username"></p>-->
-    <p>{{username}}</p>
 
   </dev>
 
