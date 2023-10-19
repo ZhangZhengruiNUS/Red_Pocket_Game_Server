@@ -2,6 +2,11 @@
 SELECT * FROM inventories
 WHERE inventory_id = $1 LIMIT 1;
 
+-- name: GetInventoryByUserIDItemID :one
+SELECT * FROM inventories
+WHERE user_id = $1
+AND item_id = $2 LIMIT 1;
+
 -- name: ListInventories :many
 SELECT * FROM inventories
 ORDER BY inventory_id
@@ -21,3 +26,9 @@ RETURNING *;
 -- name: DeleteInventory :exec
 DELETE FROM inventories
 WHERE inventory_id = $1;
+
+-- name: UpdateInventoryQuantity :one
+UPDATE inventories
+SET quantity = quantity + sqlc.arg(amount)
+WHERE inventory_id = sqlc.arg(inventory_id)
+RETURNING *;

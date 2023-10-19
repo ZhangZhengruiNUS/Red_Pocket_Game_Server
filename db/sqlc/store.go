@@ -6,13 +6,13 @@ import (
 	"fmt"
 )
 
-// provides all functions to execute db queries and transactions
+// Provides all functions to execute db queries and transactions
 type Store struct {
 	*Queries
 	db *sql.DB
 }
 
-// creates a new Store
+// Creates a new Store
 func NewStore(db *sql.DB) *Store {
 	return &Store{
 		db:      db,
@@ -20,8 +20,8 @@ func NewStore(db *sql.DB) *Store {
 	}
 }
 
-// execTx executes a function within a database transaction
-func (store *Store) execTx(ctx context.Context, fn func(*Queries) error) error {
+// ExecTx executes a function within a database transaction
+func (store *Store) ExecTx(ctx context.Context, fn func(*Queries) error) error {
 	tx, err := store.db.BeginTx(ctx, nil)
 	if err != nil {
 		return err

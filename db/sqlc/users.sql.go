@@ -109,7 +109,7 @@ func (q *Queries) ListUsers(ctx context.Context, arg ListUsersParams) ([]User, e
 		return nil, err
 	}
 	defer rows.Close()
-	var items []User
+	items := []User{}
 	for rows.Next() {
 		var i User
 		if err := rows.Scan(
@@ -132,4 +132,31 @@ func (q *Queries) ListUsers(ctx context.Context, arg ListUsersParams) ([]User, e
 		return nil, err
 	}
 	return items, nil
+}
+
+const updateUserCredit = `-- name: UpdateUserCredit :one
+UPDATE users
+SET credit = credit + $1
+WHERE user_id = $2
+RETURNING user_id, user_name, password, credit, coupon, role_type, create_time
+`
+
+type UpdateUserCreditParams struct {
+	Amount int32 `json:"amount"`
+	UserID int64 `json:"userId"`
+}
+
+func (q *Queries) UpdateUserCredit(ctx context.Context, arg UpdateUserCreditParams) (User, error) {
+	row := q.queryRow(ctx, q.updateUserCreditStmt, updateUserCredit, arg.Amount, arg.UserID)
+	var i User
+	err := row.Scan(
+		&i.UserID,
+		&i.UserName,
+		&i.Password,
+		&i.Credit,
+		&i.Coupon,
+		&i.RoleType,
+		&i.CreateTime,
+	)
+	return i, err
 }

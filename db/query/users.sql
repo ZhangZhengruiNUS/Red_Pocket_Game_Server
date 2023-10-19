@@ -25,3 +25,9 @@ RETURNING *;
 -- name: DeleteUser :exec
 DELETE FROM users
 WHERE user_id = $1;
+
+-- name: UpdateUserCredit :one
+UPDATE users
+SET credit = credit + sqlc.arg(amount)
+WHERE user_id = sqlc.arg(user_id)
+RETURNING *;

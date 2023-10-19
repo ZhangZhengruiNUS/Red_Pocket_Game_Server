@@ -67,6 +67,30 @@ func (q *Queries) GetInventory(ctx context.Context, inventoryID int64) (Inventor
 	return i, err
 }
 
+const getInventoryByUserIDItemID = `-- name: GetInventoryByUserIDItemID :one
+SELECT inventory_id, user_id, item_id, quantity, create_time FROM inventories
+WHERE user_id = $1
+AND item_id = $2 LIMIT 1
+`
+
+type GetInventoryByUserIDItemIDParams struct {
+	UserID int64 `json:"userId"`
+	ItemID int64 `json:"itemId"`
+}
+
+func (q *Queries) GetInventoryByUserIDItemID(ctx context.Context, arg GetInventoryByUserIDItemIDParams) (Inventory, error) {
+	row := q.queryRow(ctx, q.getInventoryByUserIDItemIDStmt, getInventoryByUserIDItemID, arg.UserID, arg.ItemID)
+	var i Inventory
+	err := row.Scan(
+		&i.InventoryID,
+		&i.UserID,
+		&i.ItemID,
+		&i.Quantity,
+		&i.CreateTime,
+	)
+	return i, err
+}
+
 const listInventories = `-- name: ListInventories :many
 SELECT inventory_id, user_id, item_id, quantity, create_time FROM inventories
 ORDER BY inventory_id
@@ -85,7 +109,7 @@ func (q *Queries) ListInventories(ctx context.Context, arg ListInventoriesParams
 		return nil, err
 	}
 	defer rows.Close()
-	var items []Inventory
+	items := []Inventory{}
 	for rows.Next() {
 		var i Inventory
 		if err := rows.Scan(
@@ -106,4 +130,29 @@ func (q *Queries) ListInventories(ctx context.Context, arg ListInventoriesParams
 		return nil, err
 	}
 	return items, nil
+}
+
+const updateInventoryQuantity = `-- name: UpdateInventoryQuantity :one
+UPDATE inventories
+SET quantity = quantity + $1
+WHERE inventory_id = $2
+RETURNING inventory_id, user_id, item_id, quantity, create_time
+`
+
+type UpdateInventoryQuantityParams struct {
+	Amount      int32 `json:"amount"`
+	InventoryID int64 `json:"inventoryId"`
+}
+
+func (q *Queries) UpdateInventoryQuantity(ctx context.Context, arg UpdateInventoryQuantityParams) (Inventory, error) {
+	row := q.queryRow(ctx, q.updateInventoryQuantityStmt, updateInventoryQuantity, arg.Amount, arg.InventoryID)
+	var i Inventory
+	err := row.Scan(
+		&i.InventoryID,
+		&i.UserID,
+		&i.ItemID,
+		&i.Quantity,
+		&i.CreateTime,
+	)
+	return i, err
 }
