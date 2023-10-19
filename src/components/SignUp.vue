@@ -1,14 +1,41 @@
 <script setup>
 import {ref} from "vue";
+import router from "@/router";
+import axios from "axios";
 
-const Username = ref('')
-const Password1 = ref('')
-const Password2 = ref('')
-const unmerrorMessage =ref("Sorry! The username have been taken!")
-const pwderrorMessage =ref("Sorry! The password don't match!")
-</script>
+let Username = ref('')
+let Password1 = ref('')
+let Password2 = ref('')
+let unmerrorMessage =ref("")
+let pwderrorMessage =ref("")
+let userid = ref(0)
 
-<script>
+function Sign(){
+  unmerrorMessage.value = '';
+  pwderrorMessage.value = '';
+  if(Password1.value!=Password2.value){
+    console.log("not match");
+    pwderrorMessage.value = "Sorry! The password don't match!";
+  }
+  if(Password1.value==Password2.value){
+    console.log("matched");
+    axios.post('http://localhost:5173/#/ModeChoose?username=Username',{
+      userName : Username.value,
+      password : Password1.value,
+    })
+        .then(function (response){
+      console.log(response);
+      console.log("ok");
+      userid.value = response.data.userId;
+      router.push(`/ModeChoose/${userid.value}`);
+    })
+        .catch(function (error){
+          console.log(error);
+          console.log("error");
+          unmerrorMessage.value = "Sorry! The username have been taken!";
+        })
+  }
+}
 </script>
 
 <template>
@@ -17,12 +44,14 @@ const pwderrorMessage =ref("Sorry! The password don't match!")
   <h4>Start your exciting fight journey by signing up!</h4>
   <br>
   <p> Username: <input v-model="Username" placeholder="Username"></p>
-  <p> Input your Password: <input v-model="Password1" placeholder="Password"></p>
-  <p> Config your Password: <input v-model="Password2" placeholder="Password"></p>
-  <p class="ErrorMsg" v-if="Password1!=Password2">{{pwderrorMessage}}</p>
+  <p> Input your Password: <input type="password" v-model="Password1" placeholder="Password"></p>
+  <p> Config your Password: <input type="password" v-model="Password2" placeholder="Password"></p>
+  <p class="ErrorMsg" v-if="pwderrorMessage">{{pwderrorMessage}}</p>
+  <p class="ErrorMsg" v-if="unmerrorMessage">{{unmerrorMessage}}</p>
   <br>
-  <button class="Signbutton" @click="">Sign up</button>
-  <button class="Signbutton" @click="">Quit</button>
+  <button class="Signbutton" @click="Sign">Sign up</button>
+<!--  <button class="Signbutton" @click="">Quit</button>-->
+  <p>{{Password1}}{{Password2}}</p>
 </template>
 
 <style scoped>

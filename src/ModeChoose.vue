@@ -1,19 +1,28 @@
 <script setup>
 import {ref} from 'vue'
 import router from "@/router";
+import axios from "axios";
 
-const username = router.currentRoute.value.params.username
+let userid = ref(router.currentRoute.value.params.userid)
 
-function goGame(){
-  router.push("/Game")
+//for catalog
+let catalog_equipments = ref([])
+
+
+function goGame() {
+  router.push(`/Game/`)//how to transfer the id is next to solve
 }
-function goStore(){
-  router.push("/catalog")
+
+
+function goCatalog() {
+  router.push(`/Catalog/${userid.value}`)//how to transfer the id is next to solve
 }
-function goWarehouse(){
-  router.push(`/WareHouse/${username}`)
+
+function goWarehouse() {
+  router.push(`/WareHouse/${userid.value}`);
 }
-function goStart(){
+
+function goStart() {
   router.push("/")
 }
 
@@ -21,12 +30,12 @@ function goStart(){
 
 <template>
   <dev class="base">
-    <h1 class="title">Welcome come Back! {{ username }}</h1>
+    <h1 class="title">Welcome come Back!</h1>
     <h3 class="titleChoose">Choose your battle!</h3>
 
     <el-button-group class="choose">
       <button class="choosebutton" @click="goGame">start game</button>
-      <button class="choosebutton" @click="goStore">go store</button>
+      <button class="choosebutton" @click="goCatalog">go store</button>
       <button class="choosebutton" @click="goWarehouse">my warehouse</button>
       <!--      <a href="#/StartPage">hello</a>-->
       <button class="choosebutton" @click="goStart">log out</button>
@@ -39,8 +48,8 @@ function goStart(){
 
 .base {
   display: flex;
-  flex-flow: column; justify-content: center;
-
+  flex-flow: column;
+  justify-content: center;
   text-align: center;
 }
 
@@ -52,16 +61,13 @@ function goStart(){
 }
 
 .choose {
-
   position: absolute;
   top: 32%;
   display: flex;
-
   flex-flow: column;
 }
 
 .choosebutton {
-
   height: 60px;
   width: 400px;
   line-height: 36px;
@@ -70,6 +76,7 @@ function goStart(){
   background: #accbea;
   color: #2c3e50;
   border: 1px solid transparent;
-  padding: 0 10px; margin: 20px;
+  padding: 0 10px;
+  margin: 20px;
 }
 </style>

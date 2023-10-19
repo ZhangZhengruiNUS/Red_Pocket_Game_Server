@@ -3,6 +3,22 @@ import {ref} from 'vue'
 import LogIn from './components/LogIn.vue'
 import SignUp from './components/SignUp.vue'
 
+// import axios from "axios";
+// import router from "@/router";
+//
+// axios.get('https://jsonplaceholder.typicode.com/posts/1',)
+//     .then(function (response){
+//       console.log(response);
+//       console.log("ok");
+//       console.log(response.data)
+//       console.log("id: " + response.data.id)
+//
+//     })
+//     .catch(function (error){
+//       console.log(error);
+//       console.log("error");
+//       })
+
 const picked = ref('Log In')
 
 function changePicked(choose) {

@@ -12,8 +12,10 @@ import router from "./router"
 import APP from "./route.vue"
 import naive from "naive-ui";
 
-// import axios from "axios";
-// Vue.prototype.$http = axios
+import * as Vue from "vue"
+import axios from "axios";
+import VueAxios from 'vue-axios'
+
 
 const app = createApp(APP)
 
@@ -26,6 +28,8 @@ app.use(router)
 app.use(createPinia())
 app.use(vuetify)
 app.use(naive);
+// app.use(VueAxios, axios)
+// Vue.prototype.$axios = axios
 app.mount('#app')
 
 

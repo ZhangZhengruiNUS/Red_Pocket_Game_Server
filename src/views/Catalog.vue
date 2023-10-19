@@ -88,9 +88,9 @@
             @click="goToProductPage(product.id)"
         />
       </v-col>
-    </v-row>           
-    </div>
-      <v-btn
+    </v-row>
+  </div>
+  <v-btn
       @click="goToCatelogView"
       color="primary"
       variant="elevated">
@@ -99,47 +99,64 @@
 </template>
 
 <script>
-  import { defineComponent } from "vue";
-  import ProductItem from "@/components/ProductItem.vue";
-  export default defineComponent({
-    name: 'Catalog',
-    components: {
-      ProductItem
-    }
-  })
+import {defineComponent} from "vue";
+import ProductItem from "@/components/ProductItem.vue";
+
+export default defineComponent({
+  name: 'Catalog',
+  components: {
+    ProductItem
+  }
+})
 </script>
 
 <script setup>
-  import { onMounted, ref } from "vue";
-  import { productsStore } from "@/stores/products";
-  import { useRouter } from "vue-router";
+import {onMounted, ref} from "vue";
+import {productsStore} from "@/stores/products";
+import {useRouter} from "vue-router";
+import axios from "axios";
 
-  const store = productsStore()
-  const router = useRouter()
+const store = productsStore()
+const router = useRouter()
 
-  const search = ref('')
+const search = ref('')
 
-  const goToProductPage = (id) => {
-    router.push({ name: 'ProductViewUser', params: { id } })
-  }
+let equipments = ref([])
 
-  const goToCatelogView = () => {
-    
-    router.push({ name: 'CatalogAdmin' })
-  }
+const goToProductPage = (id) => {
+  router.push({name: 'ProductViewUser', params: {id}})
+}
+
+const goToCatelogView = () => {
+
+  router.push({name: 'CatalogAdmin'})
+}
 
 
- const removeFromProduct = (id) => {
-    store.removeFromProduct(id)
-  }
+const removeFromProduct = (id) => {
+  store.removeFromProduct(id)
+}
 
- const addProduct = (id) => {
-    store.removeFromProduct(id)
-  }
+const addProduct = (id) => {
+  store.removeFromProduct(id)
+}
 
-  onMounted(async () => {
-    await store.fetchProductsFromDB()
-  })
+onMounted(async () => {
+  await store.fetchProductsFromDB()//test
+  axios.get('http://localhost:5173/#/ModeChoose?username=Username')
+      .then(function (response) {
+        let equipt;
+        for (equipt in response.data) {
+          equipments.value.push({
+            itemId: equipt.itemId,
+            itemName: equipt.itemName,
+            describe: equipt.describe,
+            price: equipt.price,
+            picPath: equipt.picPath
+          })
+        }
+      }).catch(error => console.log(error));
+})
 </script>
 
 <style scoped>

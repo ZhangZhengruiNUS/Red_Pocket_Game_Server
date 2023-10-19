@@ -1,9 +1,23 @@
 <script setup>
 import {RouterView} from "vue-router";
 import GameInterface from './Gameview/GameInterface.vue'
+import axios from "axios";
+import {ref} from "vue";
+
 let LogOutPath = "/GameInterface"
 let equipt = "/GameEquipment"
 
+let userId = ref(0)
+let diffLV = ref(0)
+let awardDensity = ref(0)
+let enemyDensity = ref(0)
+
+axios.get('http://localhost:5173/#/ModeChoose?username=Username')
+    .then(function (response) {
+      diffLV.value = response.data.diffLV;
+      awardDensity.value = response.data.awardDensity;
+      enemyDensity.value = response.data.enemyDensity;
+    }).catch(error => console.log(error))
 </script>
 
 <template>
@@ -26,7 +40,7 @@ let equipt = "/GameEquipment"
   -->
   <h1> Choose difficult Lv</h1>
   <n-carousel
-      class = "diff"
+      class="diff"
       effect="card"
       prev-slide-style="transform: translateX(-150%) translateZ(-800px);"
       next-slide-style="transform: translateX(50%) translateZ(-800px);"
@@ -71,16 +85,18 @@ let equipt = "/GameEquipment"
 </template>
 
 <style scoped>
-.diff{
+.diff {
   position: fixed;
   top: 100px;
 }
-.carousel-text{
+
+.carousel-text {
   text-align: center;
   bottom: 0;
   font-size: large;
   z-index: 3;
 }
+
 .carousel-img {
   margin: 0 auto;
   width: 100%;
@@ -90,7 +106,7 @@ let equipt = "/GameEquipment"
   z-index: 2;
 }
 
-.car-button{
+.car-button {
   background-color: greenyellow;
   border: none;
   font-size: larger;
