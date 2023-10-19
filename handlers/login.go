@@ -24,7 +24,7 @@ func (server *Server) loginHandler(ctx *gin.Context) {
 		ctx.JSON(http.StatusBadRequest, errorResponse(err))
 		return
 	}
-	fmt.Println("username=" + req.UserName)
+	fmt.Println("username=", req.UserName)
 
 	// Get data from database
 	user, err := server.store.GetUserByName(ctx, req.UserName)

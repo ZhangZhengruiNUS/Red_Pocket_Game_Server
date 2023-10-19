@@ -1,6 +1,6 @@
 # Development instructions
 
->**Recommended development OS version: Ubuntu 22.04.3 LTS**
+>**Recommended development OS version: Ubuntu 22.04.3 LTS**  
 **For other OS, such as MacOS, some details may be different, please use Google/Chatgpt to solve it**
 
 ![Backend Development Pattern](img/design_pic2.jpg)
@@ -36,11 +36,11 @@ _Continuously updated..._
     ssh-keygen -t rsa -b 4096 -C "your_email@example.com"
     ```
 
-    >Enter file in which to save the key (/home/your_user/.ssh/id_rsa)
-        _Prompt for the save path and file name of the key file (by default, it will be saved in the~/. ssh directory)_
-    Enter passphrase (empty for no passphrase)
-        _Prompt for the password used to encrypt the private key (passphrase). You can choose not to set the password and simply **press Enter** to leave it blank_
-    Enter same passphrase again
+    >Enter file in which to save the key (/home/your_user/.ssh/id_rsa)  
+        _Prompt for the save path and file name of the key file (by default, it will be saved in the~/. ssh directory)_  
+    Enter passphrase (empty for no passphrase)  
+        _Prompt for the password used to encrypt the private key (passphrase). You can choose not to set the password and simply **press Enter** to leave it blank_  
+    Enter same passphrase again  
         _Prompt to confirm password. If a password is set, enter the same password again to confirm_
 
     View Public Key
@@ -260,11 +260,11 @@ git push origin my-work
 
 - Pull request to merge branch
 
->a. Enter the GitHub repository page, open the Pull Request page, Click the "New Pull Request" button
-b. Select the branch to merge
-c. Compare changes
-d. Fill in the modified information
-e. Click the "Create Pull Request" button
+>a. Enter the GitHub repository page, open the Pull Request page, Click the "New Pull Request" button  
+b. Select the branch to merge  
+c. Compare changes  
+d. Fill in the modified information  
+e. Click the "Create Pull Request" button  
 f. Approve and merge the pull request on your own
 
 #### 3.3.2 Directly handle small changes in the main branch
@@ -355,10 +355,10 @@ _(ref: <https://docs.sqlc.dev/en/stable/tutorials/getting-started-postgresql.htm
 
 ![sqlc scripts example](img/1697650119551.jpg)
 
->-- name: GoFunctionName -> The Go function name you want generate automatically
->:one -> Return only one record
->:many -> Return some records
->:exec -> Return zero record
+>-- name: GoFunctionName -> The Go function name you want generate automatically  
+:one -> Return only one record  
+:many -> Return some records  
+:exec -> Return zero record
 
 - in the terminal, navigate to the project root directory and use the following commands
 
@@ -370,9 +370,9 @@ This will generate the affected files under "./db/sqlc", then you can find the s
 
 (2) Transactions
 
->In the following two cases, but not only the two cases, you can use this method:
->a. When you want to change(Create/Update/Delete) more than one table
->b. When you want to change(Create/Update/Delete) one table with more than one record
+>In the following two cases, but not only the two cases, you can use this method:  
+a. When you want to change(Create/Update/Delete) more than one table  
+b. When you want to change(Create/Update/Delete) one table with more than one record
 
 - The same way as "Non-Transactions" to write Sqlc sctipts and generate Go functions for a single table
 
