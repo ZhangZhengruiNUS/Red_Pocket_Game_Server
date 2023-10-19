@@ -1,15 +1,14 @@
 <script setup>
 import {ref} from 'vue'
-import axios from "axios";
+import RollTable from './components/RollTable.vue';
 
 let userId = ref(0)
 let equipments = ref([])
 let coupons = ref(-1)
 let credit = ref(-1)
-let couponWarning = ref("")
+let credits = ref(0)
 
 let startroll = ref(false)
-const rolltablepath = ref('./components/rolltable.html')
 
 axios.get('http://localhost:5173/#/ModeChoose?username=Username', {
   params: {
@@ -38,7 +37,8 @@ function getRandomColor() {
 
 function turntable() {
 //   about the jumping out turntable
-  if (couponsNumber.value == 0) {
+  if (coupons.value == 0) {
+    startroll.value = true
     couponWarning.value = "You don't have any coupons, you can get one by gaming!";
     return
   } else {
@@ -51,7 +51,18 @@ function turntable() {
 
 <template>
   <div v-if="startroll" class="overlay">
-    <iframe src="/rolltable.html" style="width: 90%; height: 90%;"></iframe>
+    <RollTable
+      :prizeList="[
+        { name: '手机', src: 'https://www.apple.com/newsroom/images/product/iphone/geo/Apple-iPhone-14-iPhone-14-Plus-hero-220907-geo.jpg.og.jpg?202308290218' },
+        { name: '手表', src: 'https://img1.baidu.com/it/u=2631716577,1296460670&fm=253&fmt=auto&app=120&f=JPEG' },
+        { name: '苹果', src: 'https://img2.baidu.com/it/u=2611478896,137965957&fm=253&fmt=auto&app=138&f=JPEG' },
+        { name: '棒棒糖', src: 'https://img2.baidu.com/it/u=576980037,1655121105&fm=253&fmt=auto&app=138&f=PNG' },
+        { name: '娃娃', src: 'https://img2.baidu.com/it/u=4075390137,3967712457&fm=253&fmt=auto&app=138&f=PNG' },
+        { name: '木马', src: 'https://img1.baidu.com/it/u=2434318933,2727681086&fm=253&fmt=auto&app=120&f=JPEG' },
+        { name: '德芙', src: 'https://img0.baidu.com/it/u=1378564582,2397555841&fm=253&fmt=auto&app=120&f=JPEG' },
+        { name: '玫瑰', src: 'https://img1.baidu.com/it/u=1125656938,422247900&fm=253&fmt=auto&app=120&f=JPEG' }
+        ]"
+    />
     <button @click="startroll=false">close</button>
   </div>
   <div>
@@ -60,9 +71,9 @@ function turntable() {
     <div>
       <h3>Your credits are: {{ credits }}</h3>
       <br>
-      <h3>You have {{ couponsNumber }} coupons!</h3>
+      <h3>You have {{ coupons }} coupons!</h3>
       <button @click="turntable">roll the turntable!</button>
-      <p v-if="couponWarning" class="ErrorMsg">{{ couponWarning }}</p>
+      <p v-if="couponWarning" class="ErrorMsg">{{ coupons }}</p>
       <p v-else>{{ }}</p>
     </div>
 
