@@ -7,13 +7,13 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// Login received data
+/* Login received data */
 type loginRequest struct {
 	UserName string `json:"userName"`
 	Password string `json:"password"`
 }
 
-// Login handle function
+/* Login handle function */
 func (server *Server) loginHandler(ctx *gin.Context) {
 	fmt.Println("================================loginHandler: Start================================")
 
@@ -24,23 +24,17 @@ func (server *Server) loginHandler(ctx *gin.Context) {
 		ctx.JSON(http.StatusBadRequest, errorResponse(err))
 		return
 	}
-
-	userName := req.UserName
-	password := req.Password
-
-	// temporary
-	fmt.Println("password=" + password)
-	fmt.Println("username=" + userName)
+	fmt.Println("username=" + req.UserName)
 
 	// Get data from database
-	user, err := server.store.GetUserByName(ctx, userName)
+	user, err := server.store.GetUserByName(ctx, req.UserName)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 		return
 	}
 
 	// Verify password and return response
-	if user.Password == password {
+	if user.Password == req.Password {
 		fmt.Println("password right")
 		ctx.JSON(http.StatusOK, user)
 	} else {

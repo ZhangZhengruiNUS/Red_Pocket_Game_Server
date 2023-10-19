@@ -11,7 +11,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// Catalog GET handle function
+/* Catalog GET handle function */
 func (server *Server) catalogHandler(ctx *gin.Context) {
 	fmt.Println("================================catalogHandler: Start================================")
 
@@ -35,13 +35,13 @@ func (server *Server) catalogHandler(ctx *gin.Context) {
 	fmt.Println("================================catalogHandler: End================================")
 }
 
-// Catalog-buy received data
+/* Catalog-buy received data */
 type catalogBuyRequest struct {
 	UserID int64 `json:"userId"`
 	ItemID int64 `json:"itemId"`
 }
 
-// Catalog-buy Post handle function
+/* Catalog-buy Post handle function */
 func (server *Server) catalogBuyHandler(ctx *gin.Context) {
 	fmt.Println("================================catalogBuyHandler: Start================================")
 
@@ -55,8 +55,6 @@ func (server *Server) catalogBuyHandler(ctx *gin.Context) {
 		ctx.JSON(http.StatusBadRequest, errorResponse(err))
 		return
 	}
-
-	// Temporary log
 	fmt.Println("UserID=", req.UserID)
 	fmt.Println("ItemID=", req.ItemID)
 
