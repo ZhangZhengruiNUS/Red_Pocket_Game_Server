@@ -370,11 +370,15 @@ This will generate the affected files under "./db/sqlc", then you can find the s
 
 (2) Transactions
 
-- Change(Create/Update/Delete) only one table with only one record
-
 >In the following two cases, but not only the two cases, you can use this method:
 >a. When you want to change(Create/Update/Delete) more than one table
 >b. When you want to change(Create/Update/Delete) one table with more than one record
+
+- The same way as "Non-Transactions" to write Sqlc sctipts and generate Go functions for a single table
+
+- Use "ExecTx" function in the "db/sqlc/store.go", put the steps in its call back function, like this:
+
+![sqlc scripts example](img/1697722482517.jpg)
 
 ### 3.4 Database
 
