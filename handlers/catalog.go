@@ -135,3 +135,34 @@ func (server *Server) catalogBuyHandler(ctx *gin.Context) {
 
 	fmt.Println("================================catalogBuyHandler: End================================")
 }
+
+/* Catalog-user received data */
+type catalogUserRequest struct {
+	UserID int64 `json:"userId"`
+}
+
+/* Catalog-user GET handle function */
+func (server *Server) catalogUserHandler(ctx *gin.Context) {
+	fmt.Println("================================loginHandler: Start================================")
+
+	var req catalogUserRequest
+
+	// Read frontend data
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		ctx.JSON(http.StatusBadRequest, errorResponse(err))
+		return
+	}
+	fmt.Println("userID=", req.UserID)
+
+	// Get data from database
+	user, err := server.store.GetUserById(ctx, req.UserID)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+
+	// Return response
+	ctx.JSON(http.StatusOK, user)
+
+	fmt.Println("================================loginHandler: End================================")
+}
