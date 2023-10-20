@@ -9,11 +9,11 @@ CREATE TABLE "users" (
 );
 
 CREATE TABLE "inventories" (
-  "inventory_id" bigserial PRIMARY KEY,
-  "user_id" bigint NOT NULL DEFAULT -1,
-  "item_id" bigint NOT NULL DEFAULT -1,
+  "user_id" bigint,
+  "item_id" bigint,
   "quantity" int NOT NULL DEFAULT 0,
-  "create_time" timestamp NOT NULL DEFAULT (now())
+  "create_time" timestamp NOT NULL DEFAULT (now()),
+  PRIMARY KEY ("user_id", "item_id")
 );
 
 CREATE TABLE "items" (

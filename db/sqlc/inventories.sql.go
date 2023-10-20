@@ -17,7 +17,7 @@ INSERT INTO inventories (
 ) VALUES (
   $1, $2, $3
 )
-RETURNING inventory_id, user_id, item_id, quantity, create_time
+RETURNING user_id, item_id, quantity, create_time
 `
 
 type CreateInventoryParams struct {
@@ -30,35 +30,6 @@ func (q *Queries) CreateInventory(ctx context.Context, arg CreateInventoryParams
 	row := q.queryRow(ctx, q.createInventoryStmt, createInventory, arg.UserID, arg.ItemID, arg.Quantity)
 	var i Inventory
 	err := row.Scan(
-		&i.InventoryID,
-		&i.UserID,
-		&i.ItemID,
-		&i.Quantity,
-		&i.CreateTime,
-	)
-	return i, err
-}
-
-const deleteInventory = `-- name: DeleteInventory :exec
-DELETE FROM inventories
-WHERE inventory_id = $1
-`
-
-func (q *Queries) DeleteInventory(ctx context.Context, inventoryID int64) error {
-	_, err := q.exec(ctx, q.deleteInventoryStmt, deleteInventory, inventoryID)
-	return err
-}
-
-const getInventory = `-- name: GetInventory :one
-SELECT inventory_id, user_id, item_id, quantity, create_time FROM inventories
-WHERE inventory_id = $1 LIMIT 1
-`
-
-func (q *Queries) GetInventory(ctx context.Context, inventoryID int64) (Inventory, error) {
-	row := q.queryRow(ctx, q.getInventoryStmt, getInventory, inventoryID)
-	var i Inventory
-	err := row.Scan(
-		&i.InventoryID,
 		&i.UserID,
 		&i.ItemID,
 		&i.Quantity,
@@ -68,7 +39,7 @@ func (q *Queries) GetInventory(ctx context.Context, inventoryID int64) (Inventor
 }
 
 const getInventoryByUserIDItemID = `-- name: GetInventoryByUserIDItemID :one
-SELECT inventory_id, user_id, item_id, quantity, create_time FROM inventories
+SELECT user_id, item_id, quantity, create_time FROM inventories
 WHERE user_id = $1
 AND item_id = $2 LIMIT 1
 `
@@ -82,7 +53,6 @@ func (q *Queries) GetInventoryByUserIDItemID(ctx context.Context, arg GetInvento
 	row := q.queryRow(ctx, q.getInventoryByUserIDItemIDStmt, getInventoryByUserIDItemID, arg.UserID, arg.ItemID)
 	var i Inventory
 	err := row.Scan(
-		&i.InventoryID,
 		&i.UserID,
 		&i.ItemID,
 		&i.Quantity,
@@ -91,33 +61,44 @@ func (q *Queries) GetInventoryByUserIDItemID(ctx context.Context, arg GetInvento
 	return i, err
 }
 
-const listInventories = `-- name: ListInventories :many
-SELECT inventory_id, user_id, item_id, quantity, create_time FROM inventories
-ORDER BY inventory_id
+const listInventoriesByUserID = `-- name: ListInventoriesByUserID :many
+SELECT t1.item_id, COALESCE(t2.item_name, ' '), COALESCE(t2.describe, ' '), t1.quantity, COALESCE(t2.pic_path, ' ')  FROM inventories t1
+LEFT JOIN items t2 ON t1.item_id = t2.item_id
+WHERE user_id = $3
+ORDER BY t1.item_id
 LIMIT $1
 OFFSET $2
 `
 
-type ListInventoriesParams struct {
+type ListInventoriesByUserIDParams struct {
 	Limit  int32 `json:"limit"`
 	Offset int32 `json:"offset"`
+	UserID int64 `json:"userId"`
 }
 
-func (q *Queries) ListInventories(ctx context.Context, arg ListInventoriesParams) ([]Inventory, error) {
-	rows, err := q.query(ctx, q.listInventoriesStmt, listInventories, arg.Limit, arg.Offset)
+type ListInventoriesByUserIDRow struct {
+	ItemID   int64  `json:"itemId"`
+	ItemName string `json:"itemName"`
+	Describe string `json:"describe"`
+	Quantity int32  `json:"quantity"`
+	PicPath  string `json:"picPath"`
+}
+
+func (q *Queries) ListInventoriesByUserID(ctx context.Context, arg ListInventoriesByUserIDParams) ([]ListInventoriesByUserIDRow, error) {
+	rows, err := q.query(ctx, q.listInventoriesByUserIDStmt, listInventoriesByUserID, arg.Limit, arg.Offset, arg.UserID)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	items := []Inventory{}
+	items := []ListInventoriesByUserIDRow{}
 	for rows.Next() {
-		var i Inventory
+		var i ListInventoriesByUserIDRow
 		if err := rows.Scan(
-			&i.InventoryID,
-			&i.UserID,
 			&i.ItemID,
+			&i.ItemName,
+			&i.Describe,
 			&i.Quantity,
-			&i.CreateTime,
+			&i.PicPath,
 		); err != nil {
 			return nil, err
 		}
@@ -135,20 +116,21 @@ func (q *Queries) ListInventories(ctx context.Context, arg ListInventoriesParams
 const updateInventoryQuantity = `-- name: UpdateInventoryQuantity :one
 UPDATE inventories
 SET quantity = quantity + $1
-WHERE inventory_id = $2
-RETURNING inventory_id, user_id, item_id, quantity, create_time
+WHERE user_id = $2
+AND item_id = $3
+RETURNING user_id, item_id, quantity, create_time
 `
 
 type UpdateInventoryQuantityParams struct {
-	Amount      int32 `json:"amount"`
-	InventoryID int64 `json:"inventoryId"`
+	Amount int32 `json:"amount"`
+	UserID int64 `json:"userId"`
+	ItemID int64 `json:"itemId"`
 }
 
 func (q *Queries) UpdateInventoryQuantity(ctx context.Context, arg UpdateInventoryQuantityParams) (Inventory, error) {
-	row := q.queryRow(ctx, q.updateInventoryQuantityStmt, updateInventoryQuantity, arg.Amount, arg.InventoryID)
+	row := q.queryRow(ctx, q.updateInventoryQuantityStmt, updateInventoryQuantity, arg.Amount, arg.UserID, arg.ItemID)
 	var i Inventory
 	err := row.Scan(
-		&i.InventoryID,
 		&i.UserID,
 		&i.ItemID,
 		&i.Quantity,

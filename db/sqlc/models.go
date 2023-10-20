@@ -20,11 +20,10 @@ type GameDifficultySetting struct {
 }
 
 type Inventory struct {
-	InventoryID int64     `json:"inventoryId"`
-	UserID      int64     `json:"userId"`
-	ItemID      int64     `json:"itemId"`
-	Quantity    int32     `json:"quantity"`
-	CreateTime  time.Time `json:"createTime"`
+	UserID     int64     `json:"userId"`
+	ItemID     int64     `json:"itemId"`
+	Quantity   int32     `json:"quantity"`
+	CreateTime time.Time `json:"createTime"`
 }
 
 type Item struct {

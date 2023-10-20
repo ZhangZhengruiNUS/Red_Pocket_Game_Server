@@ -106,7 +106,7 @@ func (server *Server) catalogBuyHandler(ctx *gin.Context) {
 				if err != nil {
 					return err
 				}
-				fmt.Println("Created inventory.InventoryID=", inventory.InventoryID)
+				fmt.Println("Inventory Created")
 			} else {
 				return err
 			}
@@ -114,13 +114,14 @@ func (server *Server) catalogBuyHandler(ctx *gin.Context) {
 		} else {
 			// If inventory not exists, update inventory's quantity
 			inventory, err = server.store.UpdateInventoryQuantity(ctx, db.UpdateInventoryQuantityParams{
-				Amount:      1,
-				InventoryID: inventory.InventoryID,
+				Amount: 1,
+				UserID: inventory.UserID,
+				ItemID: inventory.ItemID,
 			})
 			if err != nil {
 				return err
 			}
-			fmt.Println("Updated inventory.InventoryID=", inventory.InventoryID, ",inventory.Quantity=", inventory.Quantity)
+			fmt.Println("Updated inventory.Quantity=", inventory.Quantity)
 
 		}
 		ctx.JSON(http.StatusOK, user)

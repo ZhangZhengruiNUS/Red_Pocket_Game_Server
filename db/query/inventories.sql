@@ -1,15 +1,13 @@
--- name: GetInventory :one
-SELECT * FROM inventories
-WHERE inventory_id = $1 LIMIT 1;
-
 -- name: GetInventoryByUserIDItemID :one
 SELECT * FROM inventories
 WHERE user_id = $1
 AND item_id = $2 LIMIT 1;
 
--- name: ListInventories :many
-SELECT * FROM inventories
-ORDER BY inventory_id
+-- name: ListInventoriesByUserID :many
+SELECT t1.item_id, COALESCE(t2.item_name, ' '), COALESCE(t2.describe, ' '), t1.quantity, COALESCE(t2.pic_path, ' ')  FROM inventories t1
+LEFT JOIN items t2 ON t1.item_id = t2.item_id
+WHERE user_id = $3
+ORDER BY t1.item_id
 LIMIT $1
 OFFSET $2;
 
@@ -23,12 +21,9 @@ INSERT INTO inventories (
 )
 RETURNING *;
 
--- name: DeleteInventory :exec
-DELETE FROM inventories
-WHERE inventory_id = $1;
-
 -- name: UpdateInventoryQuantity :one
 UPDATE inventories
 SET quantity = quantity + sqlc.arg(amount)
-WHERE inventory_id = sqlc.arg(inventory_id)
+WHERE user_id = sqlc.arg(user_id)
+AND item_id = sqlc.arg(item_id)
 RETURNING *;

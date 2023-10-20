@@ -368,6 +368,18 @@ _(ref: <https://docs.sqlc.dev/en/stable/tutorials/getting-started-postgresql.htm
 :many -> Return some records  
 :exec -> Return zero record
 
+When you need to query two or more tables, write like this:
+
+```sql
+-- name: ListInventoriesByUserID :many
+SELECT t1.item_id, COALESCE(t2.item_name, ' '), COALESCE(t2.describe, ' '), t1.quantity, COALESCE(t2.pic_path, ' ')  FROM inventories t1
+LEFT JOIN items t2 ON t1.item_id = t2.item_id
+WHERE user_id = $3
+ORDER BY t1.item_id
+LIMIT $1
+OFFSET $2;
+```
+
 - in the terminal, navigate to the project root directory and use the following commands
 
 ```bash

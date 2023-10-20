@@ -33,17 +33,11 @@ func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 	if q.createUserStmt, err = db.PrepareContext(ctx, createUser); err != nil {
 		return nil, fmt.Errorf("error preparing query CreateUser: %w", err)
 	}
-	if q.deleteInventoryStmt, err = db.PrepareContext(ctx, deleteInventory); err != nil {
-		return nil, fmt.Errorf("error preparing query DeleteInventory: %w", err)
-	}
 	if q.deleteItemStmt, err = db.PrepareContext(ctx, deleteItem); err != nil {
 		return nil, fmt.Errorf("error preparing query DeleteItem: %w", err)
 	}
 	if q.deleteUserStmt, err = db.PrepareContext(ctx, deleteUser); err != nil {
 		return nil, fmt.Errorf("error preparing query DeleteUser: %w", err)
-	}
-	if q.getInventoryStmt, err = db.PrepareContext(ctx, getInventory); err != nil {
-		return nil, fmt.Errorf("error preparing query GetInventory: %w", err)
 	}
 	if q.getInventoryByUserIDItemIDStmt, err = db.PrepareContext(ctx, getInventoryByUserIDItemID); err != nil {
 		return nil, fmt.Errorf("error preparing query GetInventoryByUserIDItemID: %w", err)
@@ -57,8 +51,11 @@ func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 	if q.getUserByNameStmt, err = db.PrepareContext(ctx, getUserByName); err != nil {
 		return nil, fmt.Errorf("error preparing query GetUserByName: %w", err)
 	}
-	if q.listInventoriesStmt, err = db.PrepareContext(ctx, listInventories); err != nil {
-		return nil, fmt.Errorf("error preparing query ListInventories: %w", err)
+	if q.listGameDiffSetsStmt, err = db.PrepareContext(ctx, listGameDiffSets); err != nil {
+		return nil, fmt.Errorf("error preparing query ListGameDiffSets: %w", err)
+	}
+	if q.listInventoriesByUserIDStmt, err = db.PrepareContext(ctx, listInventoriesByUserID); err != nil {
+		return nil, fmt.Errorf("error preparing query ListInventoriesByUserID: %w", err)
 	}
 	if q.listItemsStmt, err = db.PrepareContext(ctx, listItems); err != nil {
 		return nil, fmt.Errorf("error preparing query ListItems: %w", err)
@@ -92,11 +89,6 @@ func (q *Queries) Close() error {
 			err = fmt.Errorf("error closing createUserStmt: %w", cerr)
 		}
 	}
-	if q.deleteInventoryStmt != nil {
-		if cerr := q.deleteInventoryStmt.Close(); cerr != nil {
-			err = fmt.Errorf("error closing deleteInventoryStmt: %w", cerr)
-		}
-	}
 	if q.deleteItemStmt != nil {
 		if cerr := q.deleteItemStmt.Close(); cerr != nil {
 			err = fmt.Errorf("error closing deleteItemStmt: %w", cerr)
@@ -105,11 +97,6 @@ func (q *Queries) Close() error {
 	if q.deleteUserStmt != nil {
 		if cerr := q.deleteUserStmt.Close(); cerr != nil {
 			err = fmt.Errorf("error closing deleteUserStmt: %w", cerr)
-		}
-	}
-	if q.getInventoryStmt != nil {
-		if cerr := q.getInventoryStmt.Close(); cerr != nil {
-			err = fmt.Errorf("error closing getInventoryStmt: %w", cerr)
 		}
 	}
 	if q.getInventoryByUserIDItemIDStmt != nil {
@@ -132,9 +119,14 @@ func (q *Queries) Close() error {
 			err = fmt.Errorf("error closing getUserByNameStmt: %w", cerr)
 		}
 	}
-	if q.listInventoriesStmt != nil {
-		if cerr := q.listInventoriesStmt.Close(); cerr != nil {
-			err = fmt.Errorf("error closing listInventoriesStmt: %w", cerr)
+	if q.listGameDiffSetsStmt != nil {
+		if cerr := q.listGameDiffSetsStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing listGameDiffSetsStmt: %w", cerr)
+		}
+	}
+	if q.listInventoriesByUserIDStmt != nil {
+		if cerr := q.listInventoriesByUserIDStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing listInventoriesByUserIDStmt: %w", cerr)
 		}
 	}
 	if q.listItemsStmt != nil {
@@ -199,15 +191,14 @@ type Queries struct {
 	createInventoryStmt            *sql.Stmt
 	createItemStmt                 *sql.Stmt
 	createUserStmt                 *sql.Stmt
-	deleteInventoryStmt            *sql.Stmt
 	deleteItemStmt                 *sql.Stmt
 	deleteUserStmt                 *sql.Stmt
-	getInventoryStmt               *sql.Stmt
 	getInventoryByUserIDItemIDStmt *sql.Stmt
 	getItemStmt                    *sql.Stmt
 	getUserByIdStmt                *sql.Stmt
 	getUserByNameStmt              *sql.Stmt
-	listInventoriesStmt            *sql.Stmt
+	listGameDiffSetsStmt           *sql.Stmt
+	listInventoriesByUserIDStmt    *sql.Stmt
 	listItemsStmt                  *sql.Stmt
 	listUsersStmt                  *sql.Stmt
 	updateInventoryQuantityStmt    *sql.Stmt
@@ -221,15 +212,14 @@ func (q *Queries) WithTx(tx *sql.Tx) *Queries {
 		createInventoryStmt:            q.createInventoryStmt,
 		createItemStmt:                 q.createItemStmt,
 		createUserStmt:                 q.createUserStmt,
-		deleteInventoryStmt:            q.deleteInventoryStmt,
 		deleteItemStmt:                 q.deleteItemStmt,
 		deleteUserStmt:                 q.deleteUserStmt,
-		getInventoryStmt:               q.getInventoryStmt,
 		getInventoryByUserIDItemIDStmt: q.getInventoryByUserIDItemIDStmt,
 		getItemStmt:                    q.getItemStmt,
 		getUserByIdStmt:                q.getUserByIdStmt,
 		getUserByNameStmt:              q.getUserByNameStmt,
-		listInventoriesStmt:            q.listInventoriesStmt,
+		listGameDiffSetsStmt:           q.listGameDiffSetsStmt,
+		listInventoriesByUserIDStmt:    q.listInventoriesByUserIDStmt,
 		listItemsStmt:                  q.listItemsStmt,
 		listUsersStmt:                  q.listUsersStmt,
 		updateInventoryQuantityStmt:    q.updateInventoryQuantityStmt,
