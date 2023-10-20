@@ -200,7 +200,15 @@ sudo snap install sqlc --channel=stable/1.22.0
 
 - Write more comments to show indicate the work of the regions, like this:
 
-![comments example](img/1697648283943.jpg)
+![comments example](img/1697780205697.jpg)
+
+Especially, add structured comments before **function** and **struct definition**, like this:
+
+![comments example](img/1697780076090.jpg)
+
+- Write "fmt" log at the beginning and end of the handler function, like this:
+
+![comments example](img/1697780038549.jpg)
 
 ### 3.3 Use Git to start team development
 
@@ -214,7 +222,7 @@ sudo snap install sqlc --channel=stable/1.22.0
 git checkout -b my-work
 ```
 
-- If you are unsure of the current branch, please use the  following command to confirm
+- If you are unsure of the current branch, please use the following command to confirm
 
 ```bash
 git branch
