@@ -134,6 +134,33 @@ func (q *Queries) ListUsers(ctx context.Context, arg ListUsersParams) ([]User, e
 	return items, nil
 }
 
+const updateUserCoupon = `-- name: UpdateUserCoupon :one
+UPDATE users
+SET coupon = coupon + $1
+WHERE user_id = $2
+RETURNING user_id, user_name, password, credit, coupon, role_type, create_time
+`
+
+type UpdateUserCouponParams struct {
+	Amount int32 `json:"amount"`
+	UserID int64 `json:"userId"`
+}
+
+func (q *Queries) UpdateUserCoupon(ctx context.Context, arg UpdateUserCouponParams) (User, error) {
+	row := q.queryRow(ctx, q.updateUserCouponStmt, updateUserCoupon, arg.Amount, arg.UserID)
+	var i User
+	err := row.Scan(
+		&i.UserID,
+		&i.UserName,
+		&i.Password,
+		&i.Credit,
+		&i.Coupon,
+		&i.RoleType,
+		&i.CreateTime,
+	)
+	return i, err
+}
+
 const updateUserCredit = `-- name: UpdateUserCredit :one
 UPDATE users
 SET credit = credit + $1

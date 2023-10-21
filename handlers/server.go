@@ -19,12 +19,16 @@ func NewServer(store *db.Store) *Server {
 
 	router.POST("/login", server.loginHandler)
 
+	router.POST("/signup", server.signupHandler)
+
 	router.GET("/catalog", server.catalogHandler)
 	router.GET("/catalog/user", server.catalogUserHandler)
 	router.POST("/catalog/buy", server.catalogBuyHandler)
 
 	router.GET("/game/diff", server.gameDiffHandler)
 	router.GET("/game/equip", server.gameEquipQueryHandler)
+	router.POST("/game/equip", server.gameEquipUpdateHandler)
+	router.POST("/game/end", server.gameEndHandler)
 
 	server.router = router
 	return server

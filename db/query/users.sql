@@ -31,3 +31,9 @@ UPDATE users
 SET credit = credit + sqlc.arg(amount)
 WHERE user_id = sqlc.arg(user_id)
 RETURNING *;
+
+-- name: UpdateUserCoupon :one
+UPDATE users
+SET coupon = coupon + sqlc.arg(amount)
+WHERE user_id = sqlc.arg(user_id)
+RETURNING *;

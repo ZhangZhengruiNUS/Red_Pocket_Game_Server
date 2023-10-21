@@ -66,6 +66,9 @@ func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 	if q.updateInventoryQuantityStmt, err = db.PrepareContext(ctx, updateInventoryQuantity); err != nil {
 		return nil, fmt.Errorf("error preparing query UpdateInventoryQuantity: %w", err)
 	}
+	if q.updateUserCouponStmt, err = db.PrepareContext(ctx, updateUserCoupon); err != nil {
+		return nil, fmt.Errorf("error preparing query UpdateUserCoupon: %w", err)
+	}
 	if q.updateUserCreditStmt, err = db.PrepareContext(ctx, updateUserCredit); err != nil {
 		return nil, fmt.Errorf("error preparing query UpdateUserCredit: %w", err)
 	}
@@ -144,6 +147,11 @@ func (q *Queries) Close() error {
 			err = fmt.Errorf("error closing updateInventoryQuantityStmt: %w", cerr)
 		}
 	}
+	if q.updateUserCouponStmt != nil {
+		if cerr := q.updateUserCouponStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing updateUserCouponStmt: %w", cerr)
+		}
+	}
 	if q.updateUserCreditStmt != nil {
 		if cerr := q.updateUserCreditStmt.Close(); cerr != nil {
 			err = fmt.Errorf("error closing updateUserCreditStmt: %w", cerr)
@@ -202,6 +210,7 @@ type Queries struct {
 	listItemsStmt                  *sql.Stmt
 	listUsersStmt                  *sql.Stmt
 	updateInventoryQuantityStmt    *sql.Stmt
+	updateUserCouponStmt           *sql.Stmt
 	updateUserCreditStmt           *sql.Stmt
 }
 
@@ -223,6 +232,7 @@ func (q *Queries) WithTx(tx *sql.Tx) *Queries {
 		listItemsStmt:                  q.listItemsStmt,
 		listUsersStmt:                  q.listUsersStmt,
 		updateInventoryQuantityStmt:    q.updateInventoryQuantityStmt,
+		updateUserCouponStmt:           q.updateUserCouponStmt,
 		updateUserCreditStmt:           q.updateUserCreditStmt,
 	}
 }

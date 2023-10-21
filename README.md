@@ -350,6 +350,14 @@ When you want to add a service in a new field, add a file under "handlers"
 
 ![add new service](img/1697479982877.png)
 
+When you need to print and check the data from the frontend, you can print it like this:
+
+```go
+bodyBytes, err := ioutil.ReadAll(ctx.Request.Body)
+fmt.Println(string(bodyBytes))
+ctx.Request.Body = ioutil.NopCloser(bytes.NewBuffer(bodyBytes))
+```
+
 ##### 3.4.2.3 Sql
 
 (1) Non-Transactions

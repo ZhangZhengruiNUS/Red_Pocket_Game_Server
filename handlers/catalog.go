@@ -2,10 +2,8 @@ package handler
 
 import (
 	db "Red_Pocket_Game_Server/db/sqlc"
-	"bytes"
 	"database/sql"
 	"fmt"
-	"io/ioutil"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -48,9 +46,6 @@ func (server *Server) catalogBuyHandler(ctx *gin.Context) {
 	var req catalogBuyRequest
 
 	// Read frontend data
-	bodyBytes, err := ioutil.ReadAll(ctx.Request.Body)
-	fmt.Println(string(bodyBytes))
-	ctx.Request.Body = ioutil.NopCloser(bytes.NewBuffer(bodyBytes))
 	if err := ctx.ShouldBindJSON(&req); err != nil {
 		ctx.JSON(http.StatusBadRequest, errorResponse(err))
 		return
@@ -59,7 +54,7 @@ func (server *Server) catalogBuyHandler(ctx *gin.Context) {
 	fmt.Println("ItemID=", req.ItemID)
 
 	// Start database transaction
-	err = server.store.ExecTx(ctx, func(q *db.Queries) error {
+	err := server.store.ExecTx(ctx, func(q *db.Queries) error {
 		// Read user's credit
 		user, err := server.store.GetUserById(ctx, req.UserID)
 		if err != nil {
@@ -110,9 +105,8 @@ func (server *Server) catalogBuyHandler(ctx *gin.Context) {
 			} else {
 				return err
 			}
-
 		} else {
-			// If inventory not exists, update inventory's quantity
+			// If inventory exists, update inventory's quantity
 			inventory, err = server.store.UpdateInventoryQuantity(ctx, db.UpdateInventoryQuantityParams{
 				Amount: 1,
 				UserID: inventory.UserID,
