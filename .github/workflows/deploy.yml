@@ -23,7 +23,7 @@ jobs:
       env:
         AWS_ROLE: ${{ secrets.AWS_ROLE_TO_ASSUME }}
       run: |
-        echo "First few characters of secret: ${AWS_ROLE:0:19}"
+        echo "First few characters of secret: ${AWS_ROLE:0:18}"
       shell: /usr/bin/bash -e {0}
 
     - name: Configure AWS credentials
