@@ -16,6 +16,13 @@ jobs:
     - name: Checkout repo
       uses: actions/checkout@v3
 
+    - name: Echo first few characters of secret
+      env:
+        AWS_ROLE: ${{ secrets.AWS_ROLE_TO_ASSUME }}
+      run: |
+        echo "First few characters of secret: ${AWS_ROLE:0:20}"
+      shell: /usr/bin/bash -e {0}
+
     - name: Configure AWS credentials
       uses: aws-actions/configure-aws-credentials@v4
       with:
