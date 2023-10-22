@@ -1,5 +1,5 @@
 postgres:
-	docker run --name postgres16 -e POSTGRES_USER=root -e POSTGRES_PASSWORD=admin123 -p 5432:5432 -d postgres:16-alpine
+	docker run --name postgres16 --network rpgame-network -e POSTGRES_USER=root -e POSTGRES_PASSWORD=admin123 -p 5432:5432 -d postgres:16-alpine
 
 createdb:
 	docker exec -it postgres16 createdb --username=root --owner=root red_pocket_game

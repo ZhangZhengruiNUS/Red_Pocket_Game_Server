@@ -1,0 +1,4 @@
+# .dockerignore
+img/
+README.md
+Go_Backend_Devlopment_Note.md

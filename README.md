@@ -162,34 +162,59 @@ This command will execute the SQL scripts in the latest **0XXXXX_init_schema.up.
 Recommend to use VSCode, other IDE is also acceptable
 Recommended installation extensions: Go
 
-#### 3.1.2 Component Installation
+#### 3.1.2 Tools Installation
+
+- Install gvm
+_Go Version Manager_
+
+```bash
+bash < <(curl -s -S -L https://raw.githubusercontent.com/moovweb/gvm/master/binscripts/gvm-installer)
+```
+
+you can see all the go versions you can install by:
+
+```bash
+gvm listall
+```
 
 - Install Go
 
 ```bash
-sudo snap install go --channel=1.18/stable
+gvm install go1.21.3
 ```
 
-- Install godef (optional)
-
-Code Navigation Tools
+Set the version of 1.21.3 as default
 
 ```bash
-go get -u github.com/rogpeppe/godef
+gvm use go1.21.3 --default
 ```
 
-- Install gopls (optional)
-
-Intelligent perception and code navigation
+- Install gopls
+_Provide "Code Autocompletion", "Code Navigation", etc._
 
 ```bash
 go get -u golang.org/x/tools/gopls
 ```
 
 - Install sqlc
+_Generate Go Code via sqlc script_
 
 ```bash
 sudo snap install sqlc --channel=stable/1.22.0
+```
+
+- Install viper
+_Reading configurations_
+
+```bash
+go get github.com/spf13/viper
+```
+
+- Install mock
+_Provide mock implementations of interfaces for unit testing._
+
+```bash
+go install github.com/golang/mock/mockgen@v1.6.0
 ```
 
 ### 3.2 Common rules
@@ -336,6 +361,12 @@ Download the Postman tool for service verification
 
 ![verify example](img/5249398125634204d8c40607c285935.png)
 
+- Config file
+
+In "app.env"
+
+![config file](img/1697875304184.png)
+
 #### 3.4.2 Devlopment
 
 ##### 3.4.2.1 Router
@@ -472,6 +503,8 @@ This will regenerate the affected files under "./db/sqlc"
 
 ![account.sql.go](img/1697375254302.png)
 
-### 3.4 Test
+### 3.5 Test
+
+### 3.6 Dockerfile
 
 ## 4. CICD
