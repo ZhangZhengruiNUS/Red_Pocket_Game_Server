@@ -24,7 +24,6 @@ func NewServer(store *db.Store) *Server {
 	config.ExposeHeaders = []string{"Content-Length"}
 	config.AllowCredentials = true
 	config.MaxAge = 12 * time.Hour
-
 	r.Use(cors.New(config))
 
 	router.POST("/login", server.loginHandler)
