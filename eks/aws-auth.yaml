@@ -8,8 +8,7 @@ data:
     - groups:
       - system:masters
       rolearn: arn:aws:iam::029225022811:role/GitHub-CICD
-      username: GitHub-CICD
-      
+      username: system:node:{{EC2PrivateDNSName}}
 
   mapUsers: |
     - groups:
