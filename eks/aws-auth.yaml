@@ -10,3 +10,8 @@ data:
       groups:
       - system:masters
 
+  mapUsers: |
+    - groups:
+      - system:masters
+      userarn: arn:aws:iam::029225022811:user/zhangzhengrui
+      username: zhangzhengrui
