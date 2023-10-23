@@ -1,8 +1,12 @@
 apiVersion: v1
+kind: ConfigMap 
+metadata:
+  name: aws-auth
+  namespqce: kube-system
 data:
   mapRoles: |
-    - groups:
-      - system:masters
-      rolearn: arn:aws:iam::029225022811:role/GitHub-CICD
+    - rolearn: arn:aws:iam::029225022811:role/GitHub-CICD
       username: GitHub-CICD
+      groups:
+      - system:masters
 
