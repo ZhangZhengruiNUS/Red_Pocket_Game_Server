@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: red-pocket-game-api-deployment
+  name: red-pocket-game-api-deploy
   labels:
     app: red-pocket-game-api
 spec:

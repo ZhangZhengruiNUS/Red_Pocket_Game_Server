@@ -4,6 +4,8 @@ import (
 	db "Red_Pocket_Game_Server/db/sqlc"
 
 	"github.com/gin-gonic/gin"
+	"github.com/gin-contrib/cors"
+	"time"
 )
 
 // server serves HTTP requests
@@ -24,7 +26,7 @@ func NewServer(store *db.Store) *Server {
 	config.ExposeHeaders = []string{"Content-Length"}
 	config.AllowCredentials = true
 	config.MaxAge = 12 * time.Hour
-	r.Use(cors.New(config))
+	router.Use(cors.New(config))
 
 	router.POST("/login", server.loginHandler)
 

@@ -1,5 +1,5 @@
 # Build stage
-FROM golang:1.21.3-alpine3.18 AS builder
+FROM golang:1.20.10-alpine3.18 AS builder
 WORKDIR /app
 COPY . .
 RUN go build -o main main.go
@@ -8,7 +8,7 @@ RUN curl -L https://github.com/golang-migrate/migrate/releases/download/v4.16.2/
 RUN tar xvz -f migrate.linux-amd64.tar.gz
 
 # Run stage
-FROM golang:1.21.3-alpine3.18
+FROM golang:1.20.10-alpine3.18
 WORKDIR /app
 COPY --from=builder /app/main .
 COPY --from=builder /app/migrate ./migrate
