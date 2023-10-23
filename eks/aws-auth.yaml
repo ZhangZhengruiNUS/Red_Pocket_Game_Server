@@ -5,10 +5,11 @@ metadata:
   namespace: kube-system
 data:
   mapRoles: |
-    - rolearn: arn:aws:iam::029225022811:role/GitHub-CICD
-      username: GitHub-CICD
-      groups:
+    - groups:
       - system:masters
+      rolearn: arn:aws:iam::029225022811:role/GitHub-CICD
+      username: GitHub-CICD
+      
 
   mapUsers: |
     - groups:
