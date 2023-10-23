@@ -4,9 +4,8 @@ metadata:
   name: aws-auth
   namespace: kube-system
 data:
-  mapRoles: |
-    - rolearn: arn:aws:iam::029225022811:role/GitHub-CICD
-      username: GitHub-CICD
-      groups:
+  mapUsers: |
+    - groups:
       - system:masters
-
+      userarn: arn:aws:iam::029225022811:user/zhangzhengrui
+      username: zhangzhengrui
