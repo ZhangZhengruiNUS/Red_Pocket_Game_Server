@@ -17,5 +17,6 @@ spec:
       containers:
       - name: red-pocket-game-api
         image: 029225022811.dkr.ecr.ap-southeast-1.amazonaws.com/red_pocket_game:latest
+        imagePullPolicy: Always
         ports:
         - containerPort: 8080
