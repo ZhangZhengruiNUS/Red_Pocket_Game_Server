@@ -1,21 +1,21 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: red-pocket-game-api-deployment
+  name: red-pocket-game-service-deployment
   labels:
-    app: red-pocket-game-api
+    app: red-pocket-game-service
 spec:
   replicas: 2
   selector:
     matchLabels:
-      app: red-pocket-game-api
+      app: red-pocket-game-service
   template:
     metadata:
       labels:
-        app: red-pocket-game-api
+        app: red-pocket-game-service
     spec:
       containers:
-      - name: red-pocket-game-api
+      - name: red-pocket-game-service
         image: 029225022811.dkr.ecr.ap-southeast-1.amazonaws.com/red_pocket_game:latest
         imagePullPolicy: Always
         ports:

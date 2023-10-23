@@ -4,7 +4,7 @@ metadata:
   name: red-pocket-game-service
 spec:
   selector:
-    app: red-pocket-game-api
+    app: red-pocket-game-service
   ports:
     - protocol: TCP
       port: 80
