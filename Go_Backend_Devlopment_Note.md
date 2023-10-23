@@ -371,3 +371,58 @@ var Pi = 3.14159  //Pi 是一个导出的变量，因为它以大写字母开头
                   //可以在外部通过math.Pi访问（也可修改）
 
 ```
+
+## 5. CICD
+
+### 5.1 Dockerfile
+
+### 5.2 AWS
+
+#### 5.2.1 CICD by Github Action
+
+##### 5.2.1.1 ECR (Elastic Container Registry)
+
+_存储、管理和部署Docker容器镜像_
+
+- 搜索ECR，并创建新的仓库
+
+![search ECR](img/1697952517730.jpg)
+
+- 输入仓库名，检查其它选项有无需要改变
+
+![create ECR](img/1697952649477.png)
+
+- 在项目根目录创建".github/workflows/deploy.yml"，并编写基础内容：
+
+```yml
+name: Deploy to production
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+
+  build:
+    name: Build image
+    runs-on: ubuntu-latest
+
+    steps:
+```
+
+- 在Github market里选择"Actions Type"，并搜索"aws ecr"，选择官方编写的"Amazon ECR "Login" Action for GitHub Actions"，并复制其"AWS credentials and region","login example usage"
+
+![Github market action ECR](img/1697953167625.png)
+_AWS credentials and region在下方_
+
+将其粘贴到deploy.yml中
+
+##### 5.2.1.2 Secrets
+
+##### 5.2.1.3 yml file for Github Action
+
+##### 5.2.1.4 K8s (Kubernetes)
+
+#### 5.2.2 DB
