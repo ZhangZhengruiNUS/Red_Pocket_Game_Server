@@ -9,7 +9,7 @@ on:
 jobs:
 
   deply:
-    name: Build image
+    name: Build & Deploy image
     runs-on: ubuntu-latest
     permissions:
       id-token: write
