@@ -25,7 +25,7 @@ class gameAPI{
     }
 
     static  getDiff(){
-        return API().get()
+        return API().get('/game/diff')
     }
 
     static createPost(data){
