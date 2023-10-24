@@ -17,7 +17,7 @@
           :src="picList[index]"
         >    
         <div class="difflv text">
-          difficult level : {{item.diffLV}} 
+          difficult level : {{item.diffLv}} 
         </div>
         <div class="award text">
           award density : {{item.awardDensity}}
