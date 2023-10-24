@@ -13,7 +13,8 @@ WORKDIR /app
 COPY --from=builder /app/main .
 COPY --from=builder /app/migrate ./migrate
 COPY app.env .
-COPY ssl ./ssl
+COPY server.crt .
+COPY server.key .
 COPY start.sh .
 COPY wait-for.sh .
 COPY db/migration ./migration
