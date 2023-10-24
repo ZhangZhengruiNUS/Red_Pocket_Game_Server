@@ -18,15 +18,7 @@ type Server struct {
 func NewServer(store *db.Store) *Server {
 	server := &Server{store: store}
 	router := gin.Default()
-
-	config := cors.DefaultConfig()
-	config.AllowAllOrigins = true
-	config.AllowMethods = []string{"POST", "GET", "PUT", "DELETE"}
-	config.AllowHeaders = []string{"Origin", "Content-Type", "Authorization", "Accept", "User-Agent", "Cache-Control", "Pragma"}
-	config.ExposeHeaders = []string{"Content-Length"}
-	config.AllowCredentials = true
-	config.MaxAge = 12 * time.Hour
-	router.Use(cors.New(config))
+	router.Use(corsMiddleware())
 
 	router.POST("/login", server.loginHandler)
 
@@ -45,10 +37,9 @@ func NewServer(store *db.Store) *Server {
 	return server
 }
 
-// start runs the HTTPS server
-func (server *Server) Start(address string, tlsCertFile string, tlsKeyFile string) error {
-	// 启动 HTTPS 服务
-	return server.router.RunTLS(address, tlsCertFile, tlsKeyFile)
+// start runs the HTTP server
+func (server *Server) Start(address string) error {
+	return server.router.Run(address)
 }
 
 // handle error response
@@ -59,4 +50,21 @@ func errorResponse(err error) gin.H {
 // handle common response
 func commonResponse(msg string) gin.H {
 	return gin.H{"error": msg}
+}
+
+// cors middleware
+func corsMiddleware() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		c.Writer.Header().Set("Access-Control-Allow-Origin", "*")
+		c.Writer.Header().Set("Access-Control-Allow-Credentials", "true")
+		c.Writer.Header().Set("Access-Control-Allow-Headers", "Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization, accept, origin, Cache-Control, X-Requested-With")
+		c.Writer.Header().Set("Access-Control-Allow-Methods", "POST, DELETE, GET, PUT")
+	
+		if c.Request.Method == "OPTIONS" {
+			c.AbortWithStatus(204)
+			return
+		}
+	
+		c.Next()
+	}
 }

@@ -27,10 +27,7 @@ func main() {
 	store := db.NewStore(conn)
 	server := handler.NewServer(store)
 
-	tlsCertFile := "server.crt"
-	tlsKeyFile := "server.key"
-
-	err = server.Start(config.ServerAddress, tlsCertFile, tlsKeyFile)
+	err = server.Start(config.ServerAddress)
 	if err != nil {
 		log.Fatal("cannot start server:", err)
 	}
