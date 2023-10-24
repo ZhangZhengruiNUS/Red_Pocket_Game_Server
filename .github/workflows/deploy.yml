@@ -58,3 +58,6 @@ jobs:
         kubectl apply -f eks/aws-auth.yaml
         kubectl apply -f eks/deployment.yaml
         kubectl apply -f eks/service.yaml
+
+    - name: Force Redeploy
+      run: kubectl rollout restart deployment/red-pocket-game-deployment
