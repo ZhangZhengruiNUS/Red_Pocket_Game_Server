@@ -4,8 +4,6 @@ import (
 	db "Red_Pocket_Game_Server/db/sqlc"
 
 	"github.com/gin-gonic/gin"
-	"github.com/gin-contrib/cors"
-	"time"
 )
 
 // server serves HTTP requests
