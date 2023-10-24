@@ -43,20 +43,19 @@ type gameEquipQueryRequest struct {
 func (server *Server) gameEquipQueryHandler(ctx *gin.Context) {
 	fmt.Println("================================gameEquipQueryHandler: Start================================")
 
-	var req gameEquipQueryRequest
-
 	// Read frontend data
-	if err := ctx.ShouldBindJSON(&req); err != nil {
+	userID, err := strconv.ParseInt(ctx.Query("userId"), 10, 64)
+	if err != nil {
 		ctx.JSON(http.StatusBadRequest, errorResponse(err))
 		return
 	}
-	fmt.Println("userID=", req.UserID)
+	fmt.Println("userID=", userID)
 
 	// Initialize query parameters
 	params := db.ListInventoriesByUserIDParams{
 		Limit:  1000, //return record quantity
 		Offset: 0,    //start record index
-		UserID: req.UserID,
+		UserID: userID,
 	}
 
 	// Get data from database
