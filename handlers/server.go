@@ -21,7 +21,7 @@ func NewServer(store *db.Store) *Server {
 
 	config := cors.DefaultConfig()
 	config.AllowAllOrigins = true
-	config.AllowMethods = []string{"POST", "GET", "PUT", "OPTIONS"}
+	config.AllowMethods = []string{"POST", "GET", "PUT", "DELETE"}
 	config.AllowHeaders = []string{"Origin", "Content-Type", "Authorization", "Accept", "User-Agent", "Cache-Control", "Pragma"}
 	config.ExposeHeaders = []string{"Content-Length"}
 	config.AllowCredentials = true
@@ -45,9 +45,10 @@ func NewServer(store *db.Store) *Server {
 	return server
 }
 
-// start runs the HTTP server
-func (server *Server) Start(address string) error {
-	return server.router.Run(address)
+// start runs the HTTPS server
+func (server *Server) Start(address string, tlsCertFile string, tlsKeyFile string) error {
+	// 启动 HTTPS 服务
+	return server.router.RunTLS(address, tlsCertFile, tlsKeyFile)
 }
 
 // handle error response
