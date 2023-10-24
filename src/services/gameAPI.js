@@ -25,7 +25,7 @@ class gameAPI{
     }
 
     static  getDiff(){
-        return API('http://localhost:9090/game/diff').get()
+        return API().get()
     }
 
     static createPost(data){
