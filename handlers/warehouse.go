@@ -16,8 +16,9 @@ type warehouseQueryRequest struct {
 
 // Define a struct that represents the combined warehouse data
 type CombinedWarehouseData struct {
-	Warehouse01 db.ListWarehouse01ByUserIDRow   `json:"warehouse01"`
-	Warehouse02 []db.ListInventoriesByUserIDRow `json:"warehouse02"`
+	Credit  int32                           `json:"credit"`
+	Coupon  int32                           `json:"coupon"`
+	Equipts []db.ListWarehouse02ByUserIDRow `json:"equipts"`
 }
 
 /* Warehouse GET handle function */
@@ -47,29 +48,20 @@ func (server *Server) warehouseInfoQueryHandler(ctx *gin.Context) {
 	// 	Offset: 0,    //start record index
 	// 	UserID: userID,
 	// }
-	params := db.ListInventoriesByUserIDParams{
+	params := db.ListWarehouse02ByUserIDParams{
 		Limit:  1000, //return record quantity
 		Offset: 0,    //start record index
 		UserID: userID,
 	}
 
 	// Get data from database
-	warehouse01, err := server.store.ListWarehouse01ByUserID(ctx, userID)
-	// ctx.JSON(http.StatusOK, warehouse01)
-	// return
-
-	// if userID == 2 {
-	// 	ctx.JSON(http.StatusBadRequest, gin.H{"error": "Test 03"})
-	// 	return
-	// }
-
+	creditAndCoupon, err := server.store.ListWarehouse01ByUserID(ctx, userID)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 		return
 	}
 
-	warehouse02, err := server.store.ListInventoriesByUserID(ctx, params)
-
+	equipts, err := server.store.ListWarehouse02ByUserID(ctx, params)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 		return
@@ -77,8 +69,9 @@ func (server *Server) warehouseInfoQueryHandler(ctx *gin.Context) {
 
 	// Initialize the combined data structure
 	combinedData := CombinedWarehouseData{
-		Warehouse01: warehouse01,
-		Warehouse02: warehouse02,
+		Credit:  creditAndCoupon.Credit,
+		Coupon:  creditAndCoupon.Coupon,
+		Equipts: equipts,
 	}
 
 	// Return response
