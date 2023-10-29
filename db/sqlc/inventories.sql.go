@@ -62,7 +62,7 @@ func (q *Queries) GetInventoryByUserIDItemID(ctx context.Context, arg GetInvento
 }
 
 const listInventoriesByUserID = `-- name: ListInventoriesByUserID :many
-SELECT t1.item_id, COALESCE(t2.item_name, ' '), COALESCE(t2.describe, ' '), t1.quantity, COALESCE(t2.pic_path, ' ')  FROM inventories t1
+SELECT t1.item_id, COALESCE(t2.item_name, ' '), COALESCE(t2.describe, ' '), t1.quantity, COALESCE(t2.price, ' '), COALESCE(t2.pic_path, ' ')  FROM inventories t1
 LEFT JOIN items t2 ON t1.item_id = t2.item_id
 WHERE user_id = $3
 ORDER BY t1.item_id
@@ -81,6 +81,7 @@ type ListInventoriesByUserIDRow struct {
 	ItemName string `json:"itemName"`
 	Describe string `json:"describe"`
 	Quantity int32  `json:"quantity"`
+	Price    int32  `json:"price"`
 	PicPath  string `json:"picPath"`
 }
 
@@ -98,6 +99,7 @@ func (q *Queries) ListInventoriesByUserID(ctx context.Context, arg ListInventori
 			&i.ItemName,
 			&i.Describe,
 			&i.Quantity,
+			&i.Price,
 			&i.PicPath,
 		); err != nil {
 			return nil, err
