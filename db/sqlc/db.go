@@ -63,6 +63,12 @@ func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 	if q.listUsersStmt, err = db.PrepareContext(ctx, listUsers); err != nil {
 		return nil, fmt.Errorf("error preparing query ListUsers: %w", err)
 	}
+	if q.listWarehouse01ByUserIDStmt, err = db.PrepareContext(ctx, listWarehouse01ByUserID); err != nil {
+		return nil, fmt.Errorf("error preparing query ListWarehouse01ByUserID: %w", err)
+	}
+	if q.listWarehouse02ByUserIDStmt, err = db.PrepareContext(ctx, listWarehouse02ByUserID); err != nil {
+		return nil, fmt.Errorf("error preparing query ListWarehouse02ByUserID: %w", err)
+	}
 	if q.updateInventoryQuantityStmt, err = db.PrepareContext(ctx, updateInventoryQuantity); err != nil {
 		return nil, fmt.Errorf("error preparing query UpdateInventoryQuantity: %w", err)
 	}
@@ -142,6 +148,16 @@ func (q *Queries) Close() error {
 			err = fmt.Errorf("error closing listUsersStmt: %w", cerr)
 		}
 	}
+	if q.listWarehouse01ByUserIDStmt != nil {
+		if cerr := q.listWarehouse01ByUserIDStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing listWarehouse01ByUserIDStmt: %w", cerr)
+		}
+	}
+	if q.listWarehouse02ByUserIDStmt != nil {
+		if cerr := q.listWarehouse02ByUserIDStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing listWarehouse02ByUserIDStmt: %w", cerr)
+		}
+	}
 	if q.updateInventoryQuantityStmt != nil {
 		if cerr := q.updateInventoryQuantityStmt.Close(); cerr != nil {
 			err = fmt.Errorf("error closing updateInventoryQuantityStmt: %w", cerr)
@@ -209,6 +225,8 @@ type Queries struct {
 	listInventoriesByUserIDStmt    *sql.Stmt
 	listItemsStmt                  *sql.Stmt
 	listUsersStmt                  *sql.Stmt
+	listWarehouse01ByUserIDStmt    *sql.Stmt
+	listWarehouse02ByUserIDStmt    *sql.Stmt
 	updateInventoryQuantityStmt    *sql.Stmt
 	updateUserCouponStmt           *sql.Stmt
 	updateUserCreditStmt           *sql.Stmt
@@ -231,6 +249,8 @@ func (q *Queries) WithTx(tx *sql.Tx) *Queries {
 		listInventoriesByUserIDStmt:    q.listInventoriesByUserIDStmt,
 		listItemsStmt:                  q.listItemsStmt,
 		listUsersStmt:                  q.listUsersStmt,
+		listWarehouse01ByUserIDStmt:    q.listWarehouse01ByUserIDStmt,
+		listWarehouse02ByUserIDStmt:    q.listWarehouse02ByUserIDStmt,
 		updateInventoryQuantityStmt:    q.updateInventoryQuantityStmt,
 		updateUserCouponStmt:           q.updateUserCouponStmt,
 		updateUserCreditStmt:           q.updateUserCreditStmt,
