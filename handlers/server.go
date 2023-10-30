@@ -32,6 +32,7 @@ func NewServer(store *db.Store) *Server {
 	router.POST("/game/end", server.gameEndHandler)
 
 	router.GET("/warehouse", server.warehouseInfoQueryHandler)
+	router.GET("/warehouse/rolltable", server.warehouseRolltableHandler)
 
 	server.router = router
 	return server

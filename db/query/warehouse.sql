@@ -9,3 +9,9 @@ WHERE user_id = $3
 ORDER BY t1.item_id
 LIMIT $1
 OFFSET $2;
+
+-- name: ListRolltable :many
+SELECT t1.prize_name, t1.pic_path, t1.weight FROM prizes t1
+ORDER BY t1.prize_id
+LIMIT $1
+OFFSET $2;

@@ -60,6 +60,9 @@ func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 	if q.listItemsStmt, err = db.PrepareContext(ctx, listItems); err != nil {
 		return nil, fmt.Errorf("error preparing query ListItems: %w", err)
 	}
+	if q.listRolltableStmt, err = db.PrepareContext(ctx, listRolltable); err != nil {
+		return nil, fmt.Errorf("error preparing query ListRolltable: %w", err)
+	}
 	if q.listUsersStmt, err = db.PrepareContext(ctx, listUsers); err != nil {
 		return nil, fmt.Errorf("error preparing query ListUsers: %w", err)
 	}
@@ -143,6 +146,11 @@ func (q *Queries) Close() error {
 			err = fmt.Errorf("error closing listItemsStmt: %w", cerr)
 		}
 	}
+	if q.listRolltableStmt != nil {
+		if cerr := q.listRolltableStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing listRolltableStmt: %w", cerr)
+		}
+	}
 	if q.listUsersStmt != nil {
 		if cerr := q.listUsersStmt.Close(); cerr != nil {
 			err = fmt.Errorf("error closing listUsersStmt: %w", cerr)
@@ -224,6 +232,7 @@ type Queries struct {
 	listGameDiffSetsStmt           *sql.Stmt
 	listInventoriesByUserIDStmt    *sql.Stmt
 	listItemsStmt                  *sql.Stmt
+	listRolltableStmt              *sql.Stmt
 	listUsersStmt                  *sql.Stmt
 	listWarehouse01ByUserIDStmt    *sql.Stmt
 	listWarehouse02ByUserIDStmt    *sql.Stmt
@@ -248,6 +257,7 @@ func (q *Queries) WithTx(tx *sql.Tx) *Queries {
 		listGameDiffSetsStmt:           q.listGameDiffSetsStmt,
 		listInventoriesByUserIDStmt:    q.listInventoriesByUserIDStmt,
 		listItemsStmt:                  q.listItemsStmt,
+		listRolltableStmt:              q.listRolltableStmt,
 		listUsersStmt:                  q.listUsersStmt,
 		listWarehouse01ByUserIDStmt:    q.listWarehouse01ByUserIDStmt,
 		listWarehouse02ByUserIDStmt:    q.listWarehouse02ByUserIDStmt,

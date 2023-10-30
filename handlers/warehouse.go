@@ -9,24 +9,9 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-/* Warehouse GET received data */
-type warehouseQueryRequest struct {
-	UserID int64 `json:"userId"`
-}
-
-// Define a struct that represents the combined warehouse data
-type CombinedWarehouseData struct {
-	Credit  int32                           `json:"credit"`
-	Coupon  int32                           `json:"coupon"`
-	Equipts []db.ListWarehouse02ByUserIDRow `json:"equipts"`
-}
-
 /* Warehouse GET handle function */
 func (server *Server) warehouseInfoQueryHandler(ctx *gin.Context) {
 	fmt.Println("================================warehouseQueryHandler: Start================================")
-
-	// Read frontend data
-	// userID, err := strconv.ParseInt(ctx.Query("userId"), 10, 64)
 
 	// Read frontend data
 	userIDStr := ctx.Query("userId")
@@ -35,24 +20,11 @@ func (server *Server) warehouseInfoQueryHandler(ctx *gin.Context) {
 		return
 	}
 	userID, err := strconv.ParseInt(userIDStr, 10, 64)
-
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, errorResponse(err))
 		return
 	}
 	fmt.Println("userID=", userID)
-
-	// Initialize query parameters
-	// params := db.ListWarehouse02ByUserIDParams{
-	// 	Limit:  1000, //return record quantity
-	// 	Offset: 0,    //start record index
-	// 	UserID: userID,
-	// }
-	params := db.ListWarehouse02ByUserIDParams{
-		Limit:  1000, //return record quantity
-		Offset: 0,    //start record index
-		UserID: userID,
-	}
 
 	// Get data from database
 	creditAndCoupon, err := server.store.ListWarehouse01ByUserID(ctx, userID)
@@ -61,10 +33,23 @@ func (server *Server) warehouseInfoQueryHandler(ctx *gin.Context) {
 		return
 	}
 
+	params := db.ListWarehouse02ByUserIDParams{
+		Limit:  1000, //return record quantity
+		Offset: 0,    //start record index
+		UserID: userID,
+	}
+
 	equipts, err := server.store.ListWarehouse02ByUserID(ctx, params)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 		return
+	}
+
+	// Define a struct that represents the combined warehouse data
+	type CombinedWarehouseData struct {
+		Credit  int32                           `json:"credit"`
+		Coupon  int32                           `json:"coupon"`
+		Equipts []db.ListWarehouse02ByUserIDRow `json:"equipts"`
 	}
 
 	// Initialize the combined data structure
@@ -79,3 +64,32 @@ func (server *Server) warehouseInfoQueryHandler(ctx *gin.Context) {
 
 	fmt.Println("================================warehouseQueryHandler: End================================")
 }
+
+/* Warehouse Rolltable GET handle function */
+func (server *Server) warehouseRolltableHandler(ctx *gin.Context) {
+	fmt.Println("================================warehouseRolltableHandler: Start================================")
+
+	// Initialize query parameters
+	params := db.ListRolltableParams{
+		Limit:  1000, //return record quantity
+		Offset: 0,    //start record index
+	}
+
+	// Get data from database
+	prizes, err := server.store.ListRolltable(ctx, params)
+
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+
+	// Return response
+	fmt.Println("prizes count:", len(prizes))
+	ctx.JSON(http.StatusOK, prizes)
+
+	fmt.Println("================================warehouseRolltableHandler: End================================")
+}
+
+// For test
+// ctx.JSON(http.StatusBadRequest, gin.H{"error": "Test 01"})
+// return

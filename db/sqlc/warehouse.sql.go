@@ -7,8 +7,49 @@ package db
 
 import (
 	"context"
-	// "database/sql"
+	"database/sql"
 )
+
+const listRolltable = `-- name: ListRolltable :many
+SELECT t1.prize_name, t1.pic_path, t1.weight FROM prizes t1
+ORDER BY t1.prize_id
+LIMIT $1
+OFFSET $2
+`
+
+type ListRolltableParams struct {
+	Limit  int32 `json:"limit"`
+	Offset int32 `json:"offset"`
+}
+
+type ListRolltableRow struct {
+	PrizeName string `json:"prizeName"`
+	PicPath   string `json:"picPath"`
+	Weight    int32  `json:"weight"`
+}
+
+func (q *Queries) ListRolltable(ctx context.Context, arg ListRolltableParams) ([]ListRolltableRow, error) {
+	rows, err := q.query(ctx, q.listRolltableStmt, listRolltable, arg.Limit, arg.Offset)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []ListRolltableRow{}
+	for rows.Next() {
+		var i ListRolltableRow
+		if err := rows.Scan(&i.PrizeName, &i.PicPath, &i.Weight); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
 
 const listWarehouse01ByUserID = `-- name: ListWarehouse01ByUserID :one
 SELECT credit, coupon FROM users
@@ -47,7 +88,7 @@ type ListWarehouse02ByUserIDRow struct {
 	ItemName string        `json:"itemName"`
 	Describe string        `json:"describe"`
 	Quantity int32         `json:"quantity"`
-	Price    int32 `json:"price"`
+	Price    sql.NullInt32 `json:"price"`
 	PicPath  string        `json:"picPath"`
 }
 
