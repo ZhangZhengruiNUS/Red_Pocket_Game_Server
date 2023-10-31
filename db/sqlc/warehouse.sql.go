@@ -10,6 +10,18 @@ import (
 	"database/sql"
 )
 
+const listCouponByUserID = `-- name: ListCouponByUserID :one
+SELECT coupon FROM users
+WHERE user_id = $1 LIMIT 1
+`
+
+func (q *Queries) ListCouponByUserID(ctx context.Context, userID int64) (int32, error) {
+	row := q.queryRow(ctx, q.listCouponByUserIDStmt, listCouponByUserID, userID)
+	var coupon int32
+	err := row.Scan(&coupon)
+	return coupon, err
+}
+
 const listRolltable = `-- name: ListRolltable :many
 SELECT t1.prize_name, t1.pic_path, t1.weight FROM prizes t1
 ORDER BY t1.prize_id
@@ -120,4 +132,23 @@ func (q *Queries) ListWarehouse02ByUserID(ctx context.Context, arg ListWarehouse
 		return nil, err
 	}
 	return items, nil
+}
+
+const updateCoupon = `-- name: UpdateCoupon :one
+UPDATE users
+SET coupon = coupon + $1
+WHERE user_id = $2
+RETURNING coupon
+`
+
+type UpdateCouponParams struct {
+	Amount int32 `json:"amount"`
+	UserID int64 `json:"userId"`
+}
+
+func (q *Queries) UpdateCoupon(ctx context.Context, arg UpdateCouponParams) (int32, error) {
+	row := q.queryRow(ctx, q.updateCouponStmt, updateCoupon, arg.Amount, arg.UserID)
+	var coupon int32
+	err := row.Scan(&coupon)
+	return coupon, err
 }

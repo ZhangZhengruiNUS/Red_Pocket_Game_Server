@@ -51,6 +51,9 @@ func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 	if q.getUserByNameStmt, err = db.PrepareContext(ctx, getUserByName); err != nil {
 		return nil, fmt.Errorf("error preparing query GetUserByName: %w", err)
 	}
+	if q.listCouponByUserIDStmt, err = db.PrepareContext(ctx, listCouponByUserID); err != nil {
+		return nil, fmt.Errorf("error preparing query ListCouponByUserID: %w", err)
+	}
 	if q.listGameDiffSetsStmt, err = db.PrepareContext(ctx, listGameDiffSets); err != nil {
 		return nil, fmt.Errorf("error preparing query ListGameDiffSets: %w", err)
 	}
@@ -71,6 +74,9 @@ func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 	}
 	if q.listWarehouse02ByUserIDStmt, err = db.PrepareContext(ctx, listWarehouse02ByUserID); err != nil {
 		return nil, fmt.Errorf("error preparing query ListWarehouse02ByUserID: %w", err)
+	}
+	if q.updateCouponStmt, err = db.PrepareContext(ctx, updateCoupon); err != nil {
+		return nil, fmt.Errorf("error preparing query UpdateCoupon: %w", err)
 	}
 	if q.updateInventoryQuantityStmt, err = db.PrepareContext(ctx, updateInventoryQuantity); err != nil {
 		return nil, fmt.Errorf("error preparing query UpdateInventoryQuantity: %w", err)
@@ -131,6 +137,11 @@ func (q *Queries) Close() error {
 			err = fmt.Errorf("error closing getUserByNameStmt: %w", cerr)
 		}
 	}
+	if q.listCouponByUserIDStmt != nil {
+		if cerr := q.listCouponByUserIDStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing listCouponByUserIDStmt: %w", cerr)
+		}
+	}
 	if q.listGameDiffSetsStmt != nil {
 		if cerr := q.listGameDiffSetsStmt.Close(); cerr != nil {
 			err = fmt.Errorf("error closing listGameDiffSetsStmt: %w", cerr)
@@ -164,6 +175,11 @@ func (q *Queries) Close() error {
 	if q.listWarehouse02ByUserIDStmt != nil {
 		if cerr := q.listWarehouse02ByUserIDStmt.Close(); cerr != nil {
 			err = fmt.Errorf("error closing listWarehouse02ByUserIDStmt: %w", cerr)
+		}
+	}
+	if q.updateCouponStmt != nil {
+		if cerr := q.updateCouponStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing updateCouponStmt: %w", cerr)
 		}
 	}
 	if q.updateInventoryQuantityStmt != nil {
@@ -229,6 +245,7 @@ type Queries struct {
 	getItemStmt                    *sql.Stmt
 	getUserByIdStmt                *sql.Stmt
 	getUserByNameStmt              *sql.Stmt
+	listCouponByUserIDStmt         *sql.Stmt
 	listGameDiffSetsStmt           *sql.Stmt
 	listInventoriesByUserIDStmt    *sql.Stmt
 	listItemsStmt                  *sql.Stmt
@@ -236,6 +253,7 @@ type Queries struct {
 	listUsersStmt                  *sql.Stmt
 	listWarehouse01ByUserIDStmt    *sql.Stmt
 	listWarehouse02ByUserIDStmt    *sql.Stmt
+	updateCouponStmt               *sql.Stmt
 	updateInventoryQuantityStmt    *sql.Stmt
 	updateUserCouponStmt           *sql.Stmt
 	updateUserCreditStmt           *sql.Stmt
@@ -254,6 +272,7 @@ func (q *Queries) WithTx(tx *sql.Tx) *Queries {
 		getItemStmt:                    q.getItemStmt,
 		getUserByIdStmt:                q.getUserByIdStmt,
 		getUserByNameStmt:              q.getUserByNameStmt,
+		listCouponByUserIDStmt:         q.listCouponByUserIDStmt,
 		listGameDiffSetsStmt:           q.listGameDiffSetsStmt,
 		listInventoriesByUserIDStmt:    q.listInventoriesByUserIDStmt,
 		listItemsStmt:                  q.listItemsStmt,
@@ -261,6 +280,7 @@ func (q *Queries) WithTx(tx *sql.Tx) *Queries {
 		listUsersStmt:                  q.listUsersStmt,
 		listWarehouse01ByUserIDStmt:    q.listWarehouse01ByUserIDStmt,
 		listWarehouse02ByUserIDStmt:    q.listWarehouse02ByUserIDStmt,
+		updateCouponStmt:               q.updateCouponStmt,
 		updateInventoryQuantityStmt:    q.updateInventoryQuantityStmt,
 		updateUserCouponStmt:           q.updateUserCouponStmt,
 		updateUserCreditStmt:           q.updateUserCreditStmt,

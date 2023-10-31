@@ -15,3 +15,13 @@ SELECT t1.prize_name, t1.pic_path, t1.weight FROM prizes t1
 ORDER BY t1.prize_id
 LIMIT $1
 OFFSET $2;
+
+-- name: ListCouponByUserID :one
+SELECT coupon FROM users
+WHERE user_id = $1 LIMIT 1;
+
+-- name: UpdateCoupon :one
+UPDATE users
+SET coupon = coupon + sqlc.arg(amount)
+WHERE user_id = sqlc.arg(user_id)
+RETURNING coupon;
