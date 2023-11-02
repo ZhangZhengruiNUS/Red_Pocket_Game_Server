@@ -49,7 +49,7 @@ func (server *Server) signupHandler(ctx *gin.Context) {
 			}
 		} else {
 			// If username exists, return err
-			ctx.JSON(http.StatusConflict, commonResponse("UserName:["+user.UserName+"]has already been signed up!"))
+			ctx.JSON(http.StatusConflict, commonResponse("UserName:["+user.UserName+"] has already been signed up!"))
 			return nil
 		}
 
