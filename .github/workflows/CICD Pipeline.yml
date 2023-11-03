@@ -17,7 +17,7 @@ jobs:
         env:
           POSTGRES_USER: root
           POSTGRES_PASSWORD: admin123
-          POSTGRES_DB: food_shop_product
+          POSTGRES_DB: red_pocket_game
         ports:
           - 5432:5432
         options: >-
@@ -49,6 +49,7 @@ jobs:
       run: make test
 
   deply:
+    needs: test
     name: Build & Deploy image
     runs-on: ubuntu-latest
     permissions:
