@@ -39,7 +39,7 @@ func (server *Server) loginHandler(ctx *gin.Context) {
 		ctx.JSON(http.StatusOK, user)
 	} else {
 		fmt.Println("password wrong")
-		ctx.JSON(http.StatusUnauthorized, commonResponse("userName & password denied"))
+		ctx.JSON(http.StatusUnauthorized, errorCustomResponse("userName & password denied"))
 	}
 
 	fmt.Println("================================loginHandler: End================================")

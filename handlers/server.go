@@ -57,8 +57,8 @@ func errorResponse(err error) gin.H {
 	return gin.H{"error": err.Error()}
 }
 
-// handle common response
-func commonResponse(msg string) gin.H {
+// handle error custom response
+func errorCustomResponse(msg string) gin.H {
 	return gin.H{"error": msg}
 }
 

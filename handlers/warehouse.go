@@ -129,7 +129,7 @@ func (server *Server) warehouseRolltableUpdateHandler(ctx *gin.Context) {
 	if coupon <= 0 {
 		// If coupon is not enough, return err
 		fmt.Println("Coupon is not enough")
-		ctx.JSON(http.StatusPaymentRequired, commonResponse("User ["+strconv.FormatInt(req.UserID, 10)+"]'s coupon is not enough!"))
+		ctx.JSON(http.StatusPaymentRequired, errorCustomResponse("User ["+strconv.FormatInt(req.UserID, 10)+"]'s coupon is not enough!"))
 		return
 	}
 

@@ -9,8 +9,8 @@ WHERE user_name = $1 LIMIT 1;
 -- name: ListUsers :many
 SELECT * FROM users
 ORDER BY user_id
-LIMIT $1
-OFFSET $2;
+LIMIT sqlc.arg(pageSize)::int
+OFFSET ((sqlc.arg(page)::int - 1) * sqlc.arg(pageSize)::int);
 
 -- name: CreateUser :one
 INSERT INTO users (

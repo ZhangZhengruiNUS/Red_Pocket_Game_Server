@@ -54,7 +54,7 @@ func (server *Server) manageRolltableUpdateHandler(ctx *gin.Context) {
 				}
 			} else {
 				// If prize exists, return err
-				ctx.JSON(http.StatusConflict, commonResponse("PrizeName:["+prize.PrizeName+"] has already been created!"))
+				ctx.JSON(http.StatusConflict, errorCustomResponse("PrizeName:["+prize.PrizeName+"] has already been created!"))
 				return nil
 			}
 
@@ -75,7 +75,7 @@ func (server *Server) manageRolltableUpdateHandler(ctx *gin.Context) {
 			if err != nil {
 				if err == sql.ErrNoRows {
 					// If prize_name not exists, return an error
-					ctx.JSON(http.StatusConflict, commonResponse("PrizeName:["+req.PrizeName+"] has not been created!"))
+					ctx.JSON(http.StatusConflict, errorCustomResponse("PrizeName:["+req.PrizeName+"] has not been created!"))
 					return nil
 				} else {
 					return err
@@ -106,7 +106,7 @@ func (server *Server) manageRolltableUpdateHandler(ctx *gin.Context) {
 			if err != nil {
 				if err == sql.ErrNoRows {
 					// If prize_name not exists, return an error
-					ctx.JSON(http.StatusConflict, commonResponse("PrizeName:["+req.PrizeName+"] has not been created!"))
+					ctx.JSON(http.StatusConflict, errorCustomResponse("PrizeName:["+req.PrizeName+"] has not been created!"))
 					return nil
 				} else {
 					return err
@@ -185,7 +185,7 @@ func (server *Server) manageCatalogUpdateHandler(ctx *gin.Context) {
 				}
 			} else {
 				// If prize exists, return err
-				ctx.JSON(http.StatusConflict, commonResponse("ItemName:["+req.ItemName+"] has already been created!"))
+				ctx.JSON(http.StatusConflict, errorCustomResponse("ItemName:["+req.ItemName+"] has already been created!"))
 				return nil
 			}
 
@@ -206,7 +206,7 @@ func (server *Server) manageCatalogUpdateHandler(ctx *gin.Context) {
 			if err != nil {
 				if err == sql.ErrNoRows {
 					// If item_name not exists, return an error
-					ctx.JSON(http.StatusConflict, commonResponse("ItemName:["+req.ItemName+"] has not been created!"))
+					ctx.JSON(http.StatusConflict, errorCustomResponse("ItemName:["+req.ItemName+"] has not been created!"))
 					return nil
 				} else {
 					return err
@@ -263,7 +263,7 @@ func (server *Server) manageCatalogDeleteHandler(ctx *gin.Context) {
 		if err != nil {
 			if err == sql.ErrNoRows {
 				// If item not exists, return an error
-				ctx.JSON(http.StatusConflict, commonResponse("ItemName:["+item.ItemName+"] has not been created!"))
+				ctx.JSON(http.StatusConflict, errorCustomResponse("ItemName:["+item.ItemName+"] has not been created!"))
 				return nil
 			} else {
 				return err
@@ -284,7 +284,7 @@ func (server *Server) manageCatalogDeleteHandler(ctx *gin.Context) {
 	// Return response
 	if err != nil {
 		if err.Error() == "pq: update or delete on table \"items\" violates foreign key constraint \"inventories_item_id_fkey\" on table \"inventories\"" {
-			ctx.JSON(http.StatusConflict, commonResponse("This item is now possessed by users, so you can not delete it!"))
+			ctx.JSON(http.StatusConflict, errorCustomResponse("This item is now possessed by users, so you can not delete it!"))
 		} else {
 			ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 		}
@@ -300,8 +300,8 @@ func (server *Server) manageDiffQueryHandler(ctx *gin.Context) {
 
 	// Initialize query parameters
 	params := db.ListItemsParams{
-		Limit:  1000, //return record quantity
-		Offset: 0,    //start record index
+		Page:     1,    //start record page
+		Pagesize: 1000, //return record quantity
 	}
 
 	// Get data from database
@@ -362,7 +362,7 @@ func (server *Server) manageDiffUpdateHandler(ctx *gin.Context) {
 				}
 			} else {
 				// If diffLv exists, return err
-				ctx.JSON(http.StatusConflict, commonResponse("This diffLv has already been created!"))
+				ctx.JSON(http.StatusConflict, errorCustomResponse("This diffLv has already been created!"))
 				return nil
 			}
 
@@ -383,7 +383,7 @@ func (server *Server) manageDiffUpdateHandler(ctx *gin.Context) {
 			if err != nil {
 				if err == sql.ErrNoRows {
 					// If diffLv not exists, return an error
-					ctx.JSON(http.StatusConflict, commonResponse("This diffLv has not been created!"))
+					ctx.JSON(http.StatusConflict, errorCustomResponse("This diffLv has not been created!"))
 					return nil
 				} else {
 					return err
@@ -418,7 +418,7 @@ func (server *Server) manageDiffUpdateHandler(ctx *gin.Context) {
 			if err != nil {
 				if err == sql.ErrNoRows {
 					// If diffLv not exists, return an error
-					ctx.JSON(http.StatusConflict, commonResponse("This diffLv has not been created!"))
+					ctx.JSON(http.StatusConflict, errorCustomResponse("This diffLv has not been created!"))
 					return nil
 				} else {
 					return err

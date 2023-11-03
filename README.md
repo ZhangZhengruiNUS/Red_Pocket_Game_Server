@@ -1,6 +1,7 @@
 # Development instructions
 
 >**Recommended development OS version: Ubuntu 22.04.3 LTS**  
+**For Windows, using WSL is highly recommended.**  
 **For other OS, such as MacOS, some details may be different, please use Google/Chatgpt to solve it**
 
 ![Backend Development Pattern](img/design_pic2.jpg)
@@ -393,9 +394,9 @@ ctx.Request.Body = ioutil.NopCloser(bytes.NewBuffer(bodyBytes))
 
 (1) Non-Transactions
 
->Only in the following two cases, you can use this method:
->a. Change(Create/Update/Delete) only one table with only one record
->b. Only read tables
+>Only in the following two cases, you can use this method:  
+a. Change(Create/Update/Delete) a single record in a single table, without the need to verify the data that could be modified by other transactions  
+b. Only read tables
 
 - Write the sqlc scripts in the "db/query/table_name.sql"(follow the syntax of sqlc), like this:
 _(ref: <https://docs.sqlc.dev/en/stable/tutorials/getting-started-postgresql.html>)_
@@ -429,11 +430,13 @@ This will generate the affected files under "./db/sqlc", then you can find the s
 
 (2) Transactions
 
->In the following two cases, but not only the two cases, you can use this method:  
-a. When you want to change(Create/Update/Delete) more than one table  
-b. When you want to change(Create/Update/Delete) one table with more than one record
+>In the following two cases, but not only the two cases, you should use this method:  
+a. You want to change(Create/Update/Delete) more than one table  
+b. You want to change(Create/Update/Delete) one table with more than one record  
+c. You want to change(Create/Update/Delete) a single record in a single table, with the need to verify the data that could be modified by other transactions
 
-- The same way as "Non-Transactions" to write Sqlc sctipts and generate Go functions for a single table
+- The same way as "Non-Transactions" to write Sqlc sctipts and generate Go functions for a single table.
+_**Note: If you want to ensure that the data you need to verify remains unchanged before making the change(Create/Update/Delete), you should use an "Explicit Lock" by adding "... FOR UPDATE" to your SQL query**_S
 
 - Use "ExecTx" function in the "db/sqlc/store.go", put the steps in its call back function, like this:
 

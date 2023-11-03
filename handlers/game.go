@@ -99,7 +99,7 @@ func (server *Server) gameEquipUpdateHandler(ctx *gin.Context) {
 			if err == sql.ErrNoRows {
 				// If userID not exists, return err
 				fmt.Println("User not exists")
-				ctx.JSON(http.StatusNotFound, commonResponse("UserID:["+strconv.FormatInt(req.UserID, 10)+"]not exists!"))
+				ctx.JSON(http.StatusNotFound, errorCustomResponse("UserID:["+strconv.FormatInt(req.UserID, 10)+"]not exists!"))
 				return nil
 			} else {
 				return err
@@ -117,7 +117,7 @@ func (server *Server) gameEquipUpdateHandler(ctx *gin.Context) {
 				if err == sql.ErrNoRows {
 					// If inventory not exists, return err
 					fmt.Println("Inventory not exists")
-					ctx.JSON(http.StatusNotFound, commonResponse("Inventory:["+strconv.FormatInt(req.ItemIDs[i], 10)+"]not exists!"))
+					ctx.JSON(http.StatusNotFound, errorCustomResponse("Inventory:["+strconv.FormatInt(req.ItemIDs[i], 10)+"]not exists!"))
 					return nil
 				} else {
 					return err
@@ -128,7 +128,7 @@ func (server *Server) gameEquipUpdateHandler(ctx *gin.Context) {
 			if inventory.Quantity <= 0 {
 				// If inventory quantity is not enough, return err
 				fmt.Println("Inventory is not enough")
-				ctx.JSON(http.StatusConflict, commonResponse("["+strconv.FormatInt(req.UserID, 10)+"]-inventory:["+strconv.FormatInt(req.ItemIDs[i], 10)+"]is not enough!"))
+				ctx.JSON(http.StatusConflict, errorCustomResponse("["+strconv.FormatInt(req.UserID, 10)+"]-inventory:["+strconv.FormatInt(req.ItemIDs[i], 10)+"]is not enough!"))
 				return nil
 			}
 
@@ -187,7 +187,7 @@ func (server *Server) gameEndHandler(ctx *gin.Context) {
 			if err == sql.ErrNoRows {
 				// If userID not exists, return err
 				fmt.Println("User not exists")
-				ctx.JSON(http.StatusNotFound, commonResponse("UserID:["+strconv.FormatInt(req.UserID, 10)+"]not exists!"))
+				ctx.JSON(http.StatusNotFound, errorCustomResponse("UserID:["+strconv.FormatInt(req.UserID, 10)+"]not exists!"))
 				return nil
 			} else {
 				return err

@@ -16,8 +16,8 @@ func (server *Server) catalogHandler(ctx *gin.Context) {
 
 	// Initialize query parameters
 	params := db.ListItemsParams{
-		Limit:  1000, //return record quantity
-		Offset: 0,    //start record index
+		Page:     1,    //start record page
+		Pagesize: 1000, //return record quantity
 	}
 
 	// Get data from database
@@ -72,7 +72,7 @@ func (server *Server) catalogBuyHandler(ctx *gin.Context) {
 
 		// Vaildate credit >= price
 		if user.Credit < item.Price {
-			ctx.JSON(http.StatusPaymentRequired, commonResponse("Credit is not enough!"))
+			ctx.JSON(http.StatusPaymentRequired, errorCustomResponse("Credit is not enough!"))
 			return nil
 		}
 
@@ -140,7 +140,7 @@ type catalogUserRequest struct {
 /* Catalog-user GET handle function */
 func (server *Server) catalogUserHandler(ctx *gin.Context) {
 	fmt.Println("================================catalogUserHandler: Start================================")
-	
+
 	// Read frontend data
 	userID, err := strconv.ParseInt(ctx.Query("userId"), 10, 64)
 	if err != nil {
