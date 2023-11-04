@@ -22,16 +22,6 @@ SET pic_path = sqlc.arg(picPath), weight = sqlc.arg(weight)
 WHERE prize_name = sqlc.arg(prize_name)
 RETURNING *;
 
--- name: GetItemByItemName :one
-SELECT * FROM items
-WHERE item_name = $1 LIMIT 1;
-
--- name: UpdateItem :one
-UPDATE items
-SET item_name = sqlc.arg(itemName), describe = sqlc.arg(describe), price = sqlc.arg(price), pic_path = sqlc.arg(picPath)
-WHERE item_id = sqlc.arg(item_id)
-RETURNING *;
-
 -- name: ListGameDiffSetsByDiffLv :one
 SELECT * FROM game_difficulty_settings
 WHERE diff_lv = $1;

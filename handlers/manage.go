@@ -3,7 +3,7 @@ package handler
 import (
 	db "Red_Pocket_Game_Server/db/sqlc"
 	"database/sql"
-	"fmt"
+	"log"
 	"net/http"
 	"strconv"
 
@@ -20,7 +20,7 @@ type manageRolltableUpdateRequest struct {
 
 /*  Manage Rolltable Update POST handle function */
 func (server *Server) manageRolltableUpdateHandler(ctx *gin.Context) {
-	fmt.Println("================================manageRolltableUpdateHandler: Start================================")
+	log.Println("================================manageRolltableUpdateHandler: Start================================")
 
 	var req manageRolltableUpdateRequest
 
@@ -29,7 +29,7 @@ func (server *Server) manageRolltableUpdateHandler(ctx *gin.Context) {
 		ctx.JSON(http.StatusBadRequest, errorResponse(err))
 		return
 	}
-	fmt.Println("prizeName =", req.PrizeName)
+	log.Println("prizeName =", req.PrizeName)
 
 	switch req.Status {
 	case "create":
@@ -48,7 +48,7 @@ func (server *Server) manageRolltableUpdateHandler(ctx *gin.Context) {
 					if err != nil {
 						return err
 					}
-					fmt.Println("Prize Created")
+					log.Println("Prize Created")
 				} else {
 					return err
 				}
@@ -86,7 +86,7 @@ func (server *Server) manageRolltableUpdateHandler(ctx *gin.Context) {
 				if err != nil {
 					return err
 				}
-				fmt.Println("Prize Deleted")
+				log.Println("Prize Deleted")
 			}
 
 			ctx.JSON(http.StatusOK, prize)
@@ -121,7 +121,7 @@ func (server *Server) manageRolltableUpdateHandler(ctx *gin.Context) {
 				if err != nil {
 					return err
 				}
-				fmt.Println("Prize Updated")
+				log.Println("Prize Updated")
 			}
 
 			ctx.JSON(http.StatusOK, prize)
@@ -134,22 +134,23 @@ func (server *Server) manageRolltableUpdateHandler(ctx *gin.Context) {
 		}
 	}
 
-	fmt.Println("================================manageRolltableUpdateHandler: End================================")
+	log.Println("================================manageRolltableUpdateHandler: End================================")
 }
 
 /* Manage Catalog Update PUT received data */
 type manageCatalogUpdateRequest struct {
-	Status   string `json:"status"`
-	ItemId   int64  `json:"itemId"`
-	ItemName string `json:"itemName"`
-	Describe string `json:"describe"`
-	Price    int32  `json:"price"`
-	PicPath  string `json:"picPath"`
+	Status     string `json:"status"`
+	ItemId     int64  `json:"itemId"`
+	ItemName   string `json:"itemName"`
+	Describe   string `json:"describe"`
+	Price      int32  `json:"price"`
+	PicPath    string `json:"picPath"`
+	OperatorId int64  `json:"opeatorId"`
 }
 
-/*  Manage Rolltable Update PUT handle function */
+/*  Manage Catalog Update PUT handle function */
 func (server *Server) manageCatalogUpdateHandler(ctx *gin.Context) {
-	fmt.Println("================================manageCatalogUpdateHandler: Start================================")
+	log.Println("================================manageCatalogUpdateHandler: Start================================")
 
 	var req manageCatalogUpdateRequest
 
@@ -158,90 +159,64 @@ func (server *Server) manageCatalogUpdateHandler(ctx *gin.Context) {
 		ctx.JSON(http.StatusBadRequest, errorResponse(err))
 		return
 	}
-	fmt.Println("itemName =", req.ItemName)
+	log.Println("itemName =", req.ItemName)
 
 	switch req.Status {
 	case "create":
 		// Start database transaction
 		err := server.store.ExecTx(ctx, func(q *db.Queries) error {
-			// Read prize
-			item, err := server.store.GetItemByItemName(ctx, req.ItemName)
+			// Create a new instance of CreateItemParams
+			httpStatus, createItemParams, err := db.CreateItemParamsFactory(server.store, ctx, req.ItemName, req.Describe, req.PicPath, req.Price, req.OperatorId)
 			if err != nil {
-				if err == sql.ErrNoRows {
-					// If item_name not exists, create it
-					item, err = server.store.CreateItem(ctx, db.CreateItemParams{
-						ItemName:  req.ItemName,
-						Describe:  req.Describe,
-						PicPath:   req.PicPath,
-						Price:     req.Price,
-						CreatorID: -1,
-					})
-					if err != nil {
-						return err
-					}
-					fmt.Println("Item Created")
-				} else {
-					return err
-				}
-			} else {
-				// If prize exists, return err
-				ctx.JSON(http.StatusConflict, errorCustomResponse("ItemName:["+req.ItemName+"] has already been created!"))
-				return nil
+				ctx.JSON(httpStatus, errorResponse(err))
+				return err
 			}
-
-			ctx.JSON(http.StatusOK, item)
+			// Insert an item in the DB
+			item, err := server.store.CreateItem(ctx, createItemParams)
+			if err != nil {
+				ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+				return err
+			}
+			log.Println("Item[" + item.ItemName + "] Created by [" + strconv.FormatInt(req.OperatorId, 10) + "]")
+			ctx.JSON(http.StatusCreated, item)
 			return nil
 		})
-		// Return response
+
 		if err != nil {
-			ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 			return
 		}
 
 	case "update":
 		// Start database transaction
 		err := server.store.ExecTx(ctx, func(q *db.Queries) error {
-			// Read prize
-			item, err := server.store.GetItem(ctx, req.ItemId)
+			// Create a new instance of UpdateItemParams
+			httpStatus, updateItemParams, err := db.CreateUpdateItemParamsFactory(server.store, ctx, req.ItemId, req.ItemName, req.Describe, req.PicPath, req.Price, req.OperatorId)
 			if err != nil {
-				if err == sql.ErrNoRows {
-					// If item_name not exists, return an error
-					ctx.JSON(http.StatusConflict, errorCustomResponse("ItemName:["+req.ItemName+"] has not been created!"))
-					return nil
-				} else {
-					return err
-				}
-			} else {
-				// If item exists, update it
-				item, err = server.store.UpdateItem(ctx, db.UpdateItemParams{
-					Itemname: req.ItemName,
-					Describe: req.Describe,
-					Price:    req.Price,
-					Picpath:  req.PicPath,
-					ItemID:   req.ItemId,
-				})
-				if err != nil {
-					return err
-				}
-				fmt.Println("Item Updated")
+				ctx.JSON(httpStatus, errorResponse(err))
+				return err
 			}
-
+			// Update the item in the DB
+			item, err := server.store.UpdateItem(ctx, updateItemParams)
+			if err != nil {
+				ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+				return err
+			}
+			log.Println("Item[" + strconv.FormatInt(item.ItemID, 10) + "] Updated by [" + strconv.FormatInt(req.OperatorId, 10) + "]")
 			ctx.JSON(http.StatusOK, item)
 			return nil
 		})
 		// Return response
 		if err != nil {
-			ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 			return
 		}
 	}
 
-	fmt.Println("================================manageCatalogUpdateHandler: End================================")
+	log.Println("================================manageCatalogUpdateHandler: End================================")
 }
 
 /*  Manage Catalog DELETE handle function */
 func (server *Server) manageCatalogDeleteHandler(ctx *gin.Context) {
-	fmt.Println("================================manageCatalogDeleteHandler: Start================================")
+	log.Println("================================manageCatalogDeleteHandler: Start================================")
 
 	// Read frontend data
 	itemIDStr := ctx.Query("itemId")
@@ -254,7 +229,7 @@ func (server *Server) manageCatalogDeleteHandler(ctx *gin.Context) {
 		ctx.JSON(http.StatusBadRequest, errorResponse(err))
 		return
 	}
-	fmt.Println("itemID =", itemID)
+	log.Println("itemID =", itemID)
 
 	// Start database transaction
 	err = server.store.ExecTx(ctx, func(q *db.Queries) error {
@@ -274,7 +249,7 @@ func (server *Server) manageCatalogDeleteHandler(ctx *gin.Context) {
 			if err != nil {
 				return err
 			}
-			fmt.Println("Item Deleted")
+			log.Println("Item Deleted")
 		}
 
 		ctx.JSON(http.StatusOK, nil)
@@ -291,12 +266,12 @@ func (server *Server) manageCatalogDeleteHandler(ctx *gin.Context) {
 		return
 	}
 
-	fmt.Println("================================manageCatalogDeleteHandler: End================================")
+	log.Println("================================manageCatalogDeleteHandler: End================================")
 }
 
 /* Manage Diff GET handle function */
 func (server *Server) manageDiffQueryHandler(ctx *gin.Context) {
-	fmt.Println("================================catalogHandler: Start================================")
+	log.Println("================================catalogHandler: Start================================")
 
 	// Initialize query parameters
 	params := db.ListItemsParams{
@@ -312,10 +287,10 @@ func (server *Server) manageDiffQueryHandler(ctx *gin.Context) {
 	}
 
 	// Return response
-	fmt.Println("items count:", len(items))
+	log.Println("items count:", len(items))
 	ctx.JSON(http.StatusOK, items)
 
-	fmt.Println("================================catalogHandler: End================================")
+	log.Println("================================catalogHandler: End================================")
 }
 
 /* Manage Diff Update POST received data */
@@ -328,7 +303,7 @@ type manageDiffUpdateRequest struct {
 
 /*  Manage DiffLv Update POST handle function */
 func (server *Server) manageDiffUpdateHandler(ctx *gin.Context) {
-	fmt.Println("================================manageDiffUpdateHandler: Start================================")
+	log.Println("================================manageDiffUpdateHandler: Start================================")
 
 	var req manageDiffUpdateRequest
 
@@ -337,7 +312,7 @@ func (server *Server) manageDiffUpdateHandler(ctx *gin.Context) {
 		ctx.JSON(http.StatusBadRequest, errorResponse(err))
 		return
 	}
-	fmt.Println("diffLV =", req.DiffLV)
+	log.Println("diffLV =", req.DiffLV)
 
 	switch req.Status {
 	case "create":
@@ -356,7 +331,7 @@ func (server *Server) manageDiffUpdateHandler(ctx *gin.Context) {
 					if err != nil {
 						return err
 					}
-					fmt.Println("diffLv Created")
+					log.Println("diffLv Created")
 				} else {
 					return err
 				}
@@ -398,7 +373,7 @@ func (server *Server) manageDiffUpdateHandler(ctx *gin.Context) {
 				if err != nil {
 					return err
 				}
-				fmt.Println("Prize Deleted")
+				log.Println("Prize Deleted")
 			}
 
 			ctx.JSON(http.StatusOK, diffLv)
@@ -433,7 +408,7 @@ func (server *Server) manageDiffUpdateHandler(ctx *gin.Context) {
 				if err != nil {
 					return err
 				}
-				fmt.Println("DiffLv Updated")
+				log.Println("DiffLv Updated")
 			}
 
 			ctx.JSON(http.StatusOK, diffLv)
@@ -445,6 +420,6 @@ func (server *Server) manageDiffUpdateHandler(ctx *gin.Context) {
 			return
 		}
 
-		fmt.Println("================================manageDiffUpdateHandler: End================================")
+		log.Println("================================manageDiffUpdateHandler: End================================")
 	}
 }
