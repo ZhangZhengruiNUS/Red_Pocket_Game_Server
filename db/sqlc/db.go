@@ -51,6 +51,9 @@ func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 	if q.deleteUserStmt, err = db.PrepareContext(ctx, deleteUser); err != nil {
 		return nil, fmt.Errorf("error preparing query DeleteUser: %w", err)
 	}
+	if q.getAverageCouponCountStmt, err = db.PrepareContext(ctx, getAverageCouponCount); err != nil {
+		return nil, fmt.Errorf("error preparing query GetAverageCouponCount: %w", err)
+	}
 	if q.getInventoryByUserIDItemIDStmt, err = db.PrepareContext(ctx, getInventoryByUserIDItemID); err != nil {
 		return nil, fmt.Errorf("error preparing query GetInventoryByUserIDItemID: %w", err)
 	}
@@ -165,6 +168,11 @@ func (q *Queries) Close() error {
 	if q.deleteUserStmt != nil {
 		if cerr := q.deleteUserStmt.Close(); cerr != nil {
 			err = fmt.Errorf("error closing deleteUserStmt: %w", cerr)
+		}
+	}
+	if q.getAverageCouponCountStmt != nil {
+		if cerr := q.getAverageCouponCountStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing getAverageCouponCountStmt: %w", cerr)
 		}
 	}
 	if q.getInventoryByUserIDItemIDStmt != nil {
@@ -325,6 +333,7 @@ type Queries struct {
 	deleteItemStmt                 *sql.Stmt
 	deletePrizeStmt                *sql.Stmt
 	deleteUserStmt                 *sql.Stmt
+	getAverageCouponCountStmt      *sql.Stmt
 	getInventoryByUserIDItemIDStmt *sql.Stmt
 	getItemStmt                    *sql.Stmt
 	getItemByItemNameStmt          *sql.Stmt
@@ -362,6 +371,7 @@ func (q *Queries) WithTx(tx *sql.Tx) *Queries {
 		deleteItemStmt:                 q.deleteItemStmt,
 		deletePrizeStmt:                q.deletePrizeStmt,
 		deleteUserStmt:                 q.deleteUserStmt,
+		getAverageCouponCountStmt:      q.getAverageCouponCountStmt,
 		getInventoryByUserIDItemIDStmt: q.getInventoryByUserIDItemIDStmt,
 		getItemStmt:                    q.getItemStmt,
 		getItemByItemNameStmt:          q.getItemByItemNameStmt,

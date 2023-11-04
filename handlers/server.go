@@ -2,6 +2,7 @@ package handler
 
 import (
 	db "Red_Pocket_Game_Server/db/sqlc"
+	"errors"
 
 	"github.com/gin-gonic/gin"
 )
@@ -59,7 +60,7 @@ func errorResponse(err error) gin.H {
 
 // handle error custom response
 func errorCustomResponse(msg string) gin.H {
-	return gin.H{"error": msg}
+	return errorResponse(errors.New(msg))
 }
 
 // cors middleware

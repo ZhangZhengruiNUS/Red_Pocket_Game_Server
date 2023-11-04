@@ -25,12 +25,9 @@ func CreateItemParamsFactory(store *Store, ctx *gin.Context, itemName string, de
 	}
 
 	// Check CreatorID exists
-	_, err = store.GetUserById(ctx, creatorID)
+	_, httpStatus, err := CheckUserExistsByID(store, ctx, creatorID)
 	if err != nil {
-		if err == sql.ErrNoRows {
-			return http.StatusBadRequest, newCreateItemParams, errors.New("OperatorID[" + strconv.FormatInt(creatorID, 10) + "] not exists")
-		}
-		return http.StatusInternalServerError, newCreateItemParams, err
+		return httpStatus, newCreateItemParams, err
 	}
 
 	// Create an instance
@@ -70,12 +67,9 @@ func CreateUpdateItemParamsFactory(store *Store, ctx *gin.Context, itemID int64,
 	}
 
 	// Check Reviserid exists
-	_, err = store.GetUserById(ctx, reviserid)
+	_, httpStatus, err := CheckUserExistsByID(store, ctx, reviserid)
 	if err != nil {
-		if err == sql.ErrNoRows {
-			return http.StatusBadRequest, newUpdateItemParams, errors.New("OperatorID[" + strconv.FormatInt(reviserid, 10) + "] not exists")
-		}
-		return http.StatusInternalServerError, newUpdateItemParams, err
+		return httpStatus, newUpdateItemParams, err
 	}
 
 	// Create an instance

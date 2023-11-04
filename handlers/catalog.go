@@ -3,7 +3,7 @@ package handler
 import (
 	db "Red_Pocket_Game_Server/db/sqlc"
 	"database/sql"
-	"fmt"
+	"log"
 	"net/http"
 	"strconv"
 
@@ -12,7 +12,7 @@ import (
 
 /* Catalog GET handle function */
 func (server *Server) catalogHandler(ctx *gin.Context) {
-	fmt.Println("================================catalogHandler: Start================================")
+	log.Println("================================catalogHandler: Start================================")
 
 	// Initialize query parameters
 	params := db.ListItemsParams{
@@ -28,10 +28,10 @@ func (server *Server) catalogHandler(ctx *gin.Context) {
 	}
 
 	// Return response
-	fmt.Println("items count:", len(items))
+	log.Println("items count:", len(items))
 	ctx.JSON(http.StatusOK, items)
 
-	fmt.Println("================================catalogHandler: End================================")
+	log.Println("================================catalogHandler: End================================")
 }
 
 /* Catalog-buy received data */
@@ -42,7 +42,7 @@ type catalogBuyRequest struct {
 
 /* Catalog-buy Post handle function */
 func (server *Server) catalogBuyHandler(ctx *gin.Context) {
-	fmt.Println("================================catalogBuyHandler: Start================================")
+	log.Println("================================catalogBuyHandler: Start================================")
 
 	var req catalogBuyRequest
 
@@ -51,8 +51,8 @@ func (server *Server) catalogBuyHandler(ctx *gin.Context) {
 		ctx.JSON(http.StatusBadRequest, errorResponse(err))
 		return
 	}
-	fmt.Println("UserID=", req.UserID)
-	fmt.Println("ItemID=", req.ItemID)
+	log.Println("UserID=", req.UserID)
+	log.Println("ItemID=", req.ItemID)
 
 	// Start database transaction
 	err := server.store.ExecTx(ctx, func(q *db.Queries) error {
@@ -61,14 +61,14 @@ func (server *Server) catalogBuyHandler(ctx *gin.Context) {
 		if err != nil {
 			return err
 		}
-		fmt.Println("user.Credit=", user.Credit)
+		log.Println("user.Credit=", user.Credit)
 
 		// Read item's price
 		item, err := server.store.GetItem(ctx, req.ItemID)
 		if err != nil {
 			return err
 		}
-		fmt.Println("item.Price=", item.Price)
+		log.Println("item.Price=", item.Price)
 
 		// Vaildate credit >= price
 		if user.Credit < item.Price {
@@ -84,7 +84,7 @@ func (server *Server) catalogBuyHandler(ctx *gin.Context) {
 		if err != nil {
 			return err
 		}
-		fmt.Println("Updated user.Credit=", user.Credit)
+		log.Println("Updated user.Credit=", user.Credit)
 
 		// Read inventory
 		inventory, err := server.store.GetInventoryByUserIDItemID(ctx, db.GetInventoryByUserIDItemIDParams{
@@ -102,7 +102,7 @@ func (server *Server) catalogBuyHandler(ctx *gin.Context) {
 				if err != nil {
 					return err
 				}
-				fmt.Println("Inventory Created")
+				log.Println("Inventory Created")
 			} else {
 				return err
 			}
@@ -116,7 +116,7 @@ func (server *Server) catalogBuyHandler(ctx *gin.Context) {
 			if err != nil {
 				return err
 			}
-			fmt.Println("Updated inventory.Quantity=", inventory.Quantity)
+			log.Println("Updated inventory.Quantity=", inventory.Quantity)
 
 		}
 		ctx.JSON(http.StatusOK, user)
@@ -129,7 +129,7 @@ func (server *Server) catalogBuyHandler(ctx *gin.Context) {
 		return
 	}
 
-	fmt.Println("================================catalogBuyHandler: End================================")
+	log.Println("================================catalogBuyHandler: End================================")
 }
 
 /* Catalog-user received data */
@@ -139,7 +139,7 @@ type catalogUserRequest struct {
 
 /* Catalog-user GET handle function */
 func (server *Server) catalogUserHandler(ctx *gin.Context) {
-	fmt.Println("================================catalogUserHandler: Start================================")
+	log.Println("================================catalogUserHandler: Start================================")
 
 	// Read frontend data
 	userID, err := strconv.ParseInt(ctx.Query("userId"), 10, 64)
@@ -147,7 +147,7 @@ func (server *Server) catalogUserHandler(ctx *gin.Context) {
 		ctx.JSON(http.StatusBadRequest, errorResponse(err))
 		return
 	}
-	fmt.Println("userID=", userID)
+	log.Println("userID=", userID)
 
 	// Get data from database
 	user, err := server.store.GetUserById(ctx, userID)
@@ -159,5 +159,5 @@ func (server *Server) catalogUserHandler(ctx *gin.Context) {
 	// Return response
 	ctx.JSON(http.StatusOK, user)
 
-	fmt.Println("================================catalogUserHandler: End================================")
+	log.Println("================================catalogUserHandler: End================================")
 }
