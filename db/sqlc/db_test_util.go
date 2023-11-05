@@ -40,3 +40,21 @@ func getFirstUserIDFromDB(testQueries *Queries) (int64, error) {
 	}
 	return users[0].UserID, nil
 }
+
+// Insert a random gameDiff, but specific CreatorID in the DB
+func insertRandomGameDiffWithCreatorID(testQueries *Queries, creatorId int64) (GameDifficultySetting, error) {
+	return testQueries.CreateDiffLv(context.Background(), CreateDiffLvParams{
+		DiffLv:       util.RandomInt32(10, 1000),
+		AwardDensity: util.RandomInt32(10, 1000),
+		EnemyDensity: util.RandomInt32(10, 1000),
+	})
+}
+
+// Update a random gameDiff, but specific CreatorID in the DB
+func updateGameDiff(testQueries *Queries, updateDiffLvParams UpdateDiffLvParams) (GameDifficultySetting, error) {
+	return testQueries.UpdateDiffLv(context.Background(), UpdateDiffLvParams{
+		DiffLv:       updateDiffLvParams.DiffLv,
+		Awarddensity: updateDiffLvParams.Awarddensity,
+		Enemydensity: updateDiffLvParams.Enemydensity,
+	})
+}

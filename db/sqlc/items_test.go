@@ -62,10 +62,34 @@ func TestItem(t *testing.T) {
 	)
 
 	// Call GetItem for OK
-	item1_getTest, err := testQueries.GetItem(context.Background(), item1.ItemID)
+	item1_getTest1, err := testQueries.GetItem(context.Background(), item1.ItemID)
 	// Check GetItem for OK
 	require.NoError(t, err)
-	require.NotEmpty(t, item1_getTest)
-	require.Equal(t, item1_getTest, item1)
+	require.NotEmpty(t, item1_getTest1)
+	require.Equal(t, item1_getTest1, item1)
 
+	// Call GetItemByItemName for OK
+	item1_getTest2, err := testQueries.GetItemByItemName(context.Background(), item1.ItemName)
+	// Check GetItem for OK
+	require.NoError(t, err)
+	require.NotEmpty(t, item1_getTest2)
+	require.Equal(t, item1_getTest2, item1)
+
+	// // Updata item5
+	// item5.ItemName = util.RandomString(20)
+	// item5.Describe = util.RandomInt32(10, 1000)
+	// item5.Price =
+	// item5.PicPath
+
+	// // Updata test data in the DB
+	// gameDiff5Updated, err := updateGameDiff(testQueries, UpdateDiffLvParams{
+	// 	DiffLv:       gameDiff5.DiffLv,
+	// 	Awarddensity: gameDiff5.AwardDensity,
+	// 	Enemydensity: gameDiff5.EnemyDensity,
+	// })
+
+	// // Check UpdateDiffLv for OK
+	// require.NoError(t, err)
+	// require.NotEmpty(t, gameDiff5Updated)
+	// require.Equal(t, gameDiff5, gameDiff5Updated)
 }

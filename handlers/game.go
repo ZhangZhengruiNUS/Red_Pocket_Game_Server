@@ -16,8 +16,8 @@ func (server *Server) gameDiffHandler(ctx *gin.Context) {
 
 	// Initialize query parameters
 	params := db.ListGameDiffSetsParams{
-		Limit:  1000, //return record quantity
-		Offset: 0,    //start record index
+		Page:     1,    //start record page
+		Pagesize: 1000, //return record quantity
 	}
 
 	// Get data from database
