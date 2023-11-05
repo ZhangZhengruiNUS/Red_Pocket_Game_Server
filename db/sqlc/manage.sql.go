@@ -102,28 +102,6 @@ func (q *Queries) DeletePrize(ctx context.Context, prizeName string) error {
 	return err
 }
 
-const getItemByItemName = `-- name: GetItemByItemName :one
-SELECT item_id, item_name, describe, pic_path, price, reviser_id, revise_time, creator_id, create_time FROM items
-WHERE item_name = $1 LIMIT 1
-`
-
-func (q *Queries) GetItemByItemName(ctx context.Context, itemName string) (Item, error) {
-	row := q.queryRow(ctx, q.getItemByItemNameStmt, getItemByItemName, itemName)
-	var i Item
-	err := row.Scan(
-		&i.ItemID,
-		&i.ItemName,
-		&i.Describe,
-		&i.PicPath,
-		&i.Price,
-		&i.ReviserID,
-		&i.ReviseTime,
-		&i.CreatorID,
-		&i.CreateTime,
-	)
-	return i, err
-}
-
 const getPrizeByPrizeName = `-- name: GetPrizeByPrizeName :one
 SELECT prize_id, prize_name, pic_path, weight, reviser_id, revise_time, creator_id, create_time FROM prizes
 WHERE prize_name = $1 LIMIT 1
@@ -185,44 +163,6 @@ func (q *Queries) UpdateDiffLv(ctx context.Context, arg UpdateDiffLvParams) (Gam
 		&i.DiffLv,
 		&i.AwardDensity,
 		&i.EnemyDensity,
-		&i.ReviserID,
-		&i.ReviseTime,
-		&i.CreatorID,
-		&i.CreateTime,
-	)
-	return i, err
-}
-
-const updateItem = `-- name: UpdateItem :one
-UPDATE items
-SET item_name = $1, describe = $2, price = $3, pic_path = $4
-WHERE item_id = $5
-RETURNING item_id, item_name, describe, pic_path, price, reviser_id, revise_time, creator_id, create_time
-`
-
-type UpdateItemParams struct {
-	Itemname string `json:"itemname"`
-	Describe string `json:"describe"`
-	Price    int32  `json:"price"`
-	Picpath  string `json:"picpath"`
-	ItemID   int64  `json:"itemId"`
-}
-
-func (q *Queries) UpdateItem(ctx context.Context, arg UpdateItemParams) (Item, error) {
-	row := q.queryRow(ctx, q.updateItemStmt, updateItem,
-		arg.Itemname,
-		arg.Describe,
-		arg.Price,
-		arg.Picpath,
-		arg.ItemID,
-	)
-	var i Item
-	err := row.Scan(
-		&i.ItemID,
-		&i.ItemName,
-		&i.Describe,
-		&i.PicPath,
-		&i.Price,
 		&i.ReviserID,
 		&i.ReviseTime,
 		&i.CreatorID,

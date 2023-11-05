@@ -51,6 +51,18 @@ func (q *Queries) DeleteUser(ctx context.Context, userID int64) error {
 	return err
 }
 
+const getAverageCouponCount = `-- name: GetAverageCouponCount :one
+SELECT COALESCE(SUM(COUPON)/NULLIF(COUNT(*), 0), 0)::int AS average_coupon 
+FROM USERS LIMIT 1
+`
+
+func (q *Queries) GetAverageCouponCount(ctx context.Context) (int32, error) {
+	row := q.queryRow(ctx, q.getAverageCouponCountStmt, getAverageCouponCount)
+	var average_coupon int32
+	err := row.Scan(&average_coupon)
+	return average_coupon, err
+}
+
 const getUserById = `-- name: GetUserById :one
 SELECT user_id, user_name, password, credit, coupon, role_type, create_time FROM users
 WHERE user_id = $1 LIMIT 1

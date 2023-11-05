@@ -37,3 +37,7 @@ UPDATE users
 SET coupon = coupon + sqlc.arg(amount)
 WHERE user_id = sqlc.arg(user_id)
 RETURNING *;
+
+-- name: GetAverageCouponCount :one
+SELECT COALESCE(SUM(COUPON)/NULLIF(COUNT(*), 0), 0)::int AS average_coupon 
+FROM USERS LIMIT 1;

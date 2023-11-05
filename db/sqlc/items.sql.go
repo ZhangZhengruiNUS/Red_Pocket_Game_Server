@@ -7,6 +7,7 @@ package db
 
 import (
 	"context"
+	"time"
 )
 
 const createItem = `-- name: CreateItem :one
@@ -15,19 +16,21 @@ INSERT INTO items (
   describe,
   pic_path,
   price,
-  creator_id
+  creator_id,
+  create_time
 ) VALUES (
-  $1, $2, $3, $4, $5
+  $1, $2, $3, $4, $5, $6
 )
 RETURNING item_id, item_name, describe, pic_path, price, reviser_id, revise_time, creator_id, create_time
 `
 
 type CreateItemParams struct {
-	ItemName  string `json:"itemName"`
-	Describe  string `json:"describe"`
-	PicPath   string `json:"picPath"`
-	Price     int32  `json:"price"`
-	CreatorID int64  `json:"creatorId"`
+	ItemName   string    `json:"itemName"`
+	Describe   string    `json:"describe"`
+	PicPath    string    `json:"picPath"`
+	Price      int32     `json:"price"`
+	CreatorID  int64     `json:"creatorId"`
+	CreateTime time.Time `json:"createTime"`
 }
 
 func (q *Queries) CreateItem(ctx context.Context, arg CreateItemParams) (Item, error) {
@@ -37,6 +40,7 @@ func (q *Queries) CreateItem(ctx context.Context, arg CreateItemParams) (Item, e
 		arg.PicPath,
 		arg.Price,
 		arg.CreatorID,
+		arg.CreateTime,
 	)
 	var i Item
 	err := row.Scan(
@@ -70,6 +74,28 @@ WHERE item_id = $1 LIMIT 1
 
 func (q *Queries) GetItem(ctx context.Context, itemID int64) (Item, error) {
 	row := q.queryRow(ctx, q.getItemStmt, getItem, itemID)
+	var i Item
+	err := row.Scan(
+		&i.ItemID,
+		&i.ItemName,
+		&i.Describe,
+		&i.PicPath,
+		&i.Price,
+		&i.ReviserID,
+		&i.ReviseTime,
+		&i.CreatorID,
+		&i.CreateTime,
+	)
+	return i, err
+}
+
+const getItemByItemName = `-- name: GetItemByItemName :one
+SELECT item_id, item_name, describe, pic_path, price, reviser_id, revise_time, creator_id, create_time FROM items
+WHERE item_name = $1 LIMIT 1
+`
+
+func (q *Queries) GetItemByItemName(ctx context.Context, itemName string) (Item, error) {
+	row := q.queryRow(ctx, q.getItemByItemNameStmt, getItemByItemName, itemName)
 	var i Item
 	err := row.Scan(
 		&i.ItemID,
@@ -128,4 +154,51 @@ func (q *Queries) ListItems(ctx context.Context, arg ListItemsParams) ([]Item, e
 		return nil, err
 	}
 	return items, nil
+}
+
+const updateItem = `-- name: UpdateItem :one
+UPDATE items
+SET item_name = $2,
+ describe = $3, 
+ price = $4, 
+ pic_path = $5, 
+ reviser_id = $6::bigint,
+ revise_time = $7::timestamp
+WHERE item_id = $1
+RETURNING item_id, item_name, describe, pic_path, price, reviser_id, revise_time, creator_id, create_time
+`
+
+type UpdateItemParams struct {
+	ItemID     int64     `json:"itemId"`
+	ItemName   string    `json:"itemName"`
+	Describe   string    `json:"describe"`
+	Price      int32     `json:"price"`
+	PicPath    string    `json:"picPath"`
+	Reviserid  int64     `json:"reviserid"`
+	Revisetime time.Time `json:"revisetime"`
+}
+
+func (q *Queries) UpdateItem(ctx context.Context, arg UpdateItemParams) (Item, error) {
+	row := q.queryRow(ctx, q.updateItemStmt, updateItem,
+		arg.ItemID,
+		arg.ItemName,
+		arg.Describe,
+		arg.Price,
+		arg.PicPath,
+		arg.Reviserid,
+		arg.Revisetime,
+	)
+	var i Item
+	err := row.Scan(
+		&i.ItemID,
+		&i.ItemName,
+		&i.Describe,
+		&i.PicPath,
+		&i.Price,
+		&i.ReviserID,
+		&i.ReviseTime,
+		&i.CreatorID,
+		&i.CreateTime,
+	)
+	return i, err
 }

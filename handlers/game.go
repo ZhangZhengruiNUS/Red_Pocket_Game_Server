@@ -3,35 +3,69 @@ package handler
 import (
 	db "Red_Pocket_Game_Server/db/sqlc"
 	"database/sql"
-	"fmt"
+	"log"
 	"net/http"
 	"strconv"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 )
 
 /* Came-diff GET handle function */
 func (server *Server) gameDiffHandler(ctx *gin.Context) {
-	fmt.Println("================================gameDiffHandler: Start================================")
+	log.Println("================================gameDiffHandler: Start================================")
 
 	// Initialize query parameters
 	params := db.ListGameDiffSetsParams{
 		Page:     1,    //start record page
 		Pagesize: 1000, //return record quantity
+<<<<<<< HEAD
+=======
+	}
+
+	// Read & Check input data
+	userIDStr := strings.TrimSpace(ctx.Query("userId"))
+	log.Println("userIDStr=", userIDStr)
+	if len(userIDStr) == 0 {
+		ctx.JSON(http.StatusBadRequest, errorCustomResponse("userIDStr is empty"))
+		return
+	}
+	userIDInt, err := strconv.ParseInt(userIDStr, 10, 64)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, errorResponse(err))
+		return
+	}
+
+	// Check user exists
+	user, httpStatus, err := db.CheckUserExistsByID(server.store, ctx, userIDInt)
+	if err != nil {
+		ctx.JSON(httpStatus, errorResponse(err))
+		return
+>>>>>>> main
 	}
 
 	// Get data from database
-	game_difficulty_settings, err := server.store.ListGameDiffSets(ctx, params)
+	gameDifficultySettings, err := server.store.ListGameDiffSets(ctx, params)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 		return
 	}
+	log.Println("gameDifficultySettings count:", len(gameDifficultySettings))
+	if len(gameDifficultySettings) == 0 {
+		ctx.JSON(http.StatusBadRequest, errorCustomResponse("No difficulty settings found"))
+		return
+	}
 
+	// Extra adjust game difficulty settings by user
+	extraDifficultyStrategy, err := getExtraGameDifficultySettingMode(server, ctx, user)
+	if err != nil {
+		return
+	}
+	extraDifficultyStrategy.AdjustGameSetting(gameDifficultySettings)
 	// Return response
-	fmt.Println("game_difficulty_settings count:", len(game_difficulty_settings))
-	ctx.JSON(http.StatusOK, game_difficulty_settings)
+	ctx.JSON(http.StatusOK, gameDifficultySettings)
 
-	fmt.Println("================================gameDiffHandler: End================================")
+	log.Println("================================gameDiffHandler: End================================")
 }
 
 /* Game-equip GET received data */
@@ -41,7 +75,7 @@ type gameEquipQueryRequest struct {
 
 /* Game-equip GET handle function */
 func (server *Server) gameEquipQueryHandler(ctx *gin.Context) {
-	fmt.Println("================================gameEquipQueryHandler: Start================================")
+	log.Println("================================gameEquipQueryHandler: Start================================")
 
 	// Read frontend data
 	userID, err := strconv.ParseInt(ctx.Query("userId"), 10, 64)
@@ -49,7 +83,7 @@ func (server *Server) gameEquipQueryHandler(ctx *gin.Context) {
 		ctx.JSON(http.StatusBadRequest, errorResponse(err))
 		return
 	}
-	fmt.Println("userID=", userID)
+	log.Println("userID=", userID)
 
 	// Initialize query parameters
 	params := db.ListInventoriesByUserIDParams{
@@ -66,10 +100,10 @@ func (server *Server) gameEquipQueryHandler(ctx *gin.Context) {
 	}
 
 	// Return response
-	fmt.Println("inventories count:", len(inventories))
+	log.Println("inventories count:", len(inventories))
 	ctx.JSON(http.StatusOK, inventories)
 
-	fmt.Println("================================gameEquipQueryHandler: End================================")
+	log.Println("================================gameEquipQueryHandler: End================================")
 }
 
 /* Game-equip POST received data */
@@ -80,7 +114,7 @@ type gameEquipUpdateRequest struct {
 
 /* Game-equip POST handle function */
 func (server *Server) gameEquipUpdateHandler(ctx *gin.Context) {
-	fmt.Println("================================gameEquipUpdateHandler: Start================================")
+	log.Println("================================gameEquipUpdateHandler: Start================================")
 
 	var req gameEquipUpdateRequest
 
@@ -89,7 +123,7 @@ func (server *Server) gameEquipUpdateHandler(ctx *gin.Context) {
 		ctx.JSON(http.StatusBadRequest, errorResponse(err))
 		return
 	}
-	fmt.Println("UserID=", req.UserID)
+	log.Println("UserID=", req.UserID)
 
 	// Start database transaction
 	err := server.store.ExecTx(ctx, func(q *db.Queries) error {
@@ -98,7 +132,7 @@ func (server *Server) gameEquipUpdateHandler(ctx *gin.Context) {
 		if err != nil {
 			if err == sql.ErrNoRows {
 				// If userID not exists, return err
-				fmt.Println("User not exists")
+				log.Println("User not exists")
 				ctx.JSON(http.StatusNotFound, errorCustomResponse("UserID:["+strconv.FormatInt(req.UserID, 10)+"]not exists!"))
 				return nil
 			} else {
@@ -116,7 +150,7 @@ func (server *Server) gameEquipUpdateHandler(ctx *gin.Context) {
 			if err != nil {
 				if err == sql.ErrNoRows {
 					// If inventory not exists, return err
-					fmt.Println("Inventory not exists")
+					log.Println("Inventory not exists")
 					ctx.JSON(http.StatusNotFound, errorCustomResponse("Inventory:["+strconv.FormatInt(req.ItemIDs[i], 10)+"]not exists!"))
 					return nil
 				} else {
@@ -127,7 +161,7 @@ func (server *Server) gameEquipUpdateHandler(ctx *gin.Context) {
 			// Validate quantity
 			if inventory.Quantity <= 0 {
 				// If inventory quantity is not enough, return err
-				fmt.Println("Inventory is not enough")
+				log.Println("Inventory is not enough")
 				ctx.JSON(http.StatusConflict, errorCustomResponse("["+strconv.FormatInt(req.UserID, 10)+"]-inventory:["+strconv.FormatInt(req.ItemIDs[i], 10)+"]is not enough!"))
 				return nil
 			}
@@ -141,7 +175,7 @@ func (server *Server) gameEquipUpdateHandler(ctx *gin.Context) {
 			if err != nil {
 				return err
 			}
-			fmt.Println("Updated inventory.Quantity=", inventory.Quantity)
+			log.Println("Updated inventory.Quantity=", inventory.Quantity)
 		}
 
 		ctx.JSON(http.StatusOK, nil)
@@ -154,7 +188,7 @@ func (server *Server) gameEquipUpdateHandler(ctx *gin.Context) {
 		return
 	}
 
-	fmt.Println("================================gameEquipUpdateHandler: End================================")
+	log.Println("================================gameEquipUpdateHandler: End================================")
 }
 
 /* Game-end POST received data */
@@ -166,7 +200,7 @@ type gameEndRequest struct {
 
 /* Game-end POST handle function */
 func (server *Server) gameEndHandler(ctx *gin.Context) {
-	fmt.Println("================================gameEndHandler: Start================================")
+	log.Println("================================gameEndHandler: Start================================")
 
 	var req gameEndRequest
 
@@ -175,9 +209,9 @@ func (server *Server) gameEndHandler(ctx *gin.Context) {
 		ctx.JSON(http.StatusBadRequest, errorResponse(err))
 		return
 	}
-	fmt.Println("UserID=", req.UserID)
-	fmt.Println("Credit=", req.Credit)
-	fmt.Println("Coupon=", req.Coupon)
+	log.Println("UserID=", req.UserID)
+	log.Println("Credit=", req.Credit)
+	log.Println("Coupon=", req.Coupon)
 
 	// Start database transaction
 	err := server.store.ExecTx(ctx, func(q *db.Queries) error {
@@ -186,7 +220,7 @@ func (server *Server) gameEndHandler(ctx *gin.Context) {
 		if err != nil {
 			if err == sql.ErrNoRows {
 				// If userID not exists, return err
-				fmt.Println("User not exists")
+				log.Println("User not exists")
 				ctx.JSON(http.StatusNotFound, errorCustomResponse("UserID:["+strconv.FormatInt(req.UserID, 10)+"]not exists!"))
 				return nil
 			} else {
@@ -202,7 +236,7 @@ func (server *Server) gameEndHandler(ctx *gin.Context) {
 		if err != nil {
 			return err
 		}
-		fmt.Println("Updated user.Credit=", user.Credit)
+		log.Println("Updated user.Credit=", user.Credit)
 
 		// Update user's Coupon
 		user, err = server.store.UpdateUserCoupon(ctx, db.UpdateUserCouponParams{
@@ -212,7 +246,7 @@ func (server *Server) gameEndHandler(ctx *gin.Context) {
 		if err != nil {
 			return err
 		}
-		fmt.Println("Updated user.Coupon=", user.Coupon)
+		log.Println("Updated user.Coupon=", user.Coupon)
 
 		ctx.JSON(http.StatusOK, user)
 		return nil
@@ -224,5 +258,33 @@ func (server *Server) gameEndHandler(ctx *gin.Context) {
 		return
 	}
 
-	fmt.Println("================================gameEndHandler: End================================")
+	log.Println("================================gameEndHandler: End================================")
+}
+
+/* Get extra game difficulty setting mode */
+func getExtraGameDifficultySettingMode(server *Server, ctx *gin.Context, user db.User) (ExtraDifficultyStrategy, error) {
+	var extraDifficultyStrategy ExtraDifficultyStrategy
+	// Get Average Coupon Count
+	averageCouponCount, err := server.store.GetAverageCouponCount(ctx)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return extraDifficultyStrategy, err
+	}
+	log.Println("user.Coupon=", user.Coupon)
+	log.Println("averageCouponCount=", averageCouponCount)
+
+	// Judge extra game difficulty setting mode
+	if float32(user.Coupon) > float32(averageCouponCount)*1.5 {
+		// If (current user's coupon count)  > (average * 1.5), then adjust the difficulty setting to hard
+		extraDifficultyStrategy = HardDiffStrategy{}
+		log.Println("Hard mode")
+	} else if float32(user.Coupon) <= float32(averageCouponCount)*0.5 {
+		// If (current user's coupon count)  <= (average * 0.5), then adjust the difficulty setting to easy
+		extraDifficultyStrategy = EasyDiffStrategy{}
+		log.Println("Easy mode")
+	} else {
+		extraDifficultyStrategy = NormalDiffStrategy{}
+		log.Println("Normal mode")
+	}
+	return extraDifficultyStrategy, nil
 }
