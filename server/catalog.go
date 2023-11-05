@@ -10,6 +10,18 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+/* CatalogModule */
+type CatalogModule struct{}
+
+func (m *CatalogModule) RegisterRoutes(server *Server, router *gin.Engine) {
+	users := router.Group("/catalog")
+	{
+		users.GET("", server.catalogHandler)
+		users.GET("/user", server.catalogUserHandler)
+		users.POST("/buy", server.catalogBuyHandler)
+	}
+}
+
 /* Catalog GET handle function */
 func (server *Server) catalogHandler(ctx *gin.Context) {
 	log.Println("================================catalogHandler: Start================================")

@@ -10,6 +10,22 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+/* ManageModule */
+type ManageModule struct{}
+
+func (m *ManageModule) RegisterRoutes(server *Server, router *gin.Engine) {
+	users := router.Group("/manage")
+	{
+		users.GET("/rolltable", server.warehouseRolltableQueryHandler)
+		users.POST("/rolltable", server.manageRolltableUpdateHandler)
+		users.GET("/catalog", server.catalogHandler)
+		users.PUT("/catalog", server.manageCatalogUpdateHandler)
+		users.DELETE("/catalog", server.manageCatalogDeleteHandler)
+		users.GET("/diff", server.manageDiffQueryHandler)
+		users.POST("/diff", server.manageDiffUpdateHandler)
+	}
+}
+
 /* Manage Rolltable Update POST received data */
 type manageRolltableUpdateRequest struct {
 	Status    string `json:"status"`

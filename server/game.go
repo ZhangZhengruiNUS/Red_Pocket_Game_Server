@@ -11,7 +11,20 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-/* Came-diff GET handle function */
+/* GameModule */
+type GameModule struct{}
+
+func (m *GameModule) RegisterRoutes(server *Server, router *gin.Engine) {
+	users := router.Group("/game")
+	{
+		users.GET("/diff", server.gameDiffHandler)
+		users.GET("/equip", server.gameEquipQueryHandler)
+		users.POST("/equip", server.gameEquipUpdateHandler)
+		users.POST("/end", server.gameEndHandler)
+	}
+}
+
+/* Game-diff GET handle function */
 func (server *Server) gameDiffHandler(ctx *gin.Context) {
 	log.Println("================================gameDiffHandler: Start================================")
 
