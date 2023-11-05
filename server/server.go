@@ -1,8 +1,7 @@
-package handler
+package server
 
 import (
 	db "Red_Pocket_Game_Server/db/sqlc"
-	"errors"
 
 	"github.com/gin-gonic/gin"
 )
@@ -41,7 +40,7 @@ func NewServer(store *db.Store) *Server {
 	router.GET("/manage/catalog", server.catalogHandler)
 	router.PUT("/manage/catalog", server.manageCatalogUpdateHandler)
 	router.DELETE("/manage/catalog", server.manageCatalogDeleteHandler)
-	router.GET("/manage/diff", server.gameDiffHandler)
+	router.GET("/manage/diff", server.manageDiffQueryHandler)
 	router.POST("/manage/diff", server.manageDiffUpdateHandler)
 
 	server.router = router
@@ -51,16 +50,6 @@ func NewServer(store *db.Store) *Server {
 // start runs the HTTP server
 func (server *Server) Start(address string) error {
 	return server.router.Run(address)
-}
-
-// handle error response
-func errorResponse(err error) gin.H {
-	return gin.H{"error": err.Error()}
-}
-
-// handle error custom response
-func errorCustomResponse(msg string) gin.H {
-	return errorResponse(errors.New(msg))
 }
 
 // cors middleware

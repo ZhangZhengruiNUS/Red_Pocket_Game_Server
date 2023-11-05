@@ -1,4 +1,4 @@
-package handler
+package server
 
 import (
 	db "Red_Pocket_Game_Server/db/sqlc"

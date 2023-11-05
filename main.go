@@ -2,7 +2,7 @@ package main
 
 import (
 	db "Red_Pocket_Game_Server/db/sqlc"
-	handler "Red_Pocket_Game_Server/handlers"
+	s "Red_Pocket_Game_Server/server"
 	"Red_Pocket_Game_Server/util"
 	"database/sql"
 	"fmt"
@@ -25,7 +25,7 @@ func main() {
 	}
 
 	store := db.NewStore(conn)
-	server := handler.NewServer(store)
+	server := s.NewServer(store)
 
 	err = server.Start(config.ServerAddress)
 	if err != nil {

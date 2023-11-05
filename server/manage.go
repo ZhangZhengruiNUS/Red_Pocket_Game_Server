@@ -1,4 +1,4 @@
-package handler
+package server
 
 import (
 	db "Red_Pocket_Game_Server/db/sqlc"
@@ -271,26 +271,26 @@ func (server *Server) manageCatalogDeleteHandler(ctx *gin.Context) {
 
 /* Manage Diff GET handle function */
 func (server *Server) manageDiffQueryHandler(ctx *gin.Context) {
-	log.Println("================================catalogHandler: Start================================")
+	log.Println("================================manageDiffQueryHandler: Start================================")
 
 	// Initialize query parameters
-	params := db.ListItemsParams{
+	params := db.ListGameDiffSetsParams{
 		Page:     1,    //start record page
 		Pagesize: 1000, //return record quantity
 	}
 
 	// Get data from database
-	items, err := server.store.ListItems(ctx, params)
+	gameDifficultySettings, err := server.store.ListGameDiffSets(ctx, params)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 		return
 	}
 
 	// Return response
-	log.Println("items count:", len(items))
-	ctx.JSON(http.StatusOK, items)
+	log.Println("count=", len(gameDifficultySettings))
+	ctx.JSON(http.StatusOK, gameDifficultySettings)
 
-	log.Println("================================catalogHandler: End================================")
+	log.Println("================================manageDiffQueryHandler: End================================")
 }
 
 /* Manage Diff Update POST received data */

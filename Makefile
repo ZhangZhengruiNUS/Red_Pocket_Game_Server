@@ -26,7 +26,7 @@ server:
 	go run main.go
 
 test:
-	go test -cover ./db/sqlc/ ./handlers
+	go test -cover ./db/sqlc/
 
 mock:
 	mockgen -package mockdb -destination db/mock/store.go Food_Shop_Server/db/sqlc Store
