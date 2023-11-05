@@ -41,3 +41,17 @@ RETURNING *;
 -- name: GetAverageCouponCount :one
 SELECT COALESCE(SUM(COUPON)/NULLIF(COUNT(*), 0), 0)::int AS average_coupon 
 FROM USERS LIMIT 1;
+
+-- name: ListWarehouse01ByUserID :one
+SELECT credit, coupon FROM users
+WHERE user_id = $1 LIMIT 1;
+
+-- name: ListCouponByUserID :one
+SELECT coupon FROM users
+WHERE user_id = $1 LIMIT 1;
+
+-- name: UpdateCoupon :one
+UPDATE users
+SET coupon = coupon + sqlc.arg(amount)
+WHERE user_id = sqlc.arg(user_id)
+RETURNING coupon;
