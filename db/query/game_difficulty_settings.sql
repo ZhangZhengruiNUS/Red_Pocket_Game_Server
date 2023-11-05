@@ -29,3 +29,6 @@ UPDATE game_difficulty_settings
 SET award_density = sqlc.arg(awardDensity), enemy_density = sqlc.arg(enemyDensity)
 WHERE diff_lv = $1
 RETURNING *;
+
+-- name: DeleteAllGameDiffSets :exec
+DELETE FROM game_difficulty_settings;

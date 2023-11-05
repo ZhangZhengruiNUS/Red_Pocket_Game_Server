@@ -34,7 +34,7 @@ type manageRolltableUpdateRequest struct {
 	Weight    int32  `json:"weight"`
 }
 
-/*  Manage Rolltable Update POST handle function */
+/* Manage Rolltable Update POST handle function */
 func (server *Server) manageRolltableUpdateHandler(ctx *gin.Context) {
 	log.Println("================================manageRolltableUpdateHandler: Start================================")
 
@@ -52,11 +52,11 @@ func (server *Server) manageRolltableUpdateHandler(ctx *gin.Context) {
 		// Start database transaction
 		err := server.store.ExecTx(ctx, func(q *db.Queries) error {
 			// Read prize
-			prize, err := server.store.GetPrizeByPrizeName(ctx, req.PrizeName)
+			prize, err := q.GetPrizeByPrizeName(ctx, req.PrizeName)
 			if err != nil {
 				if err == sql.ErrNoRows {
 					// If prize_name not exists, create it
-					prize, err = server.store.CreatePrize(ctx, db.CreatePrizeParams{
+					prize, err = q.CreatePrize(ctx, db.CreatePrizeParams{
 						PrizeName: req.PrizeName,
 						PicPath:   req.PicPath,
 						Weight:    req.Weight,
@@ -87,7 +87,7 @@ func (server *Server) manageRolltableUpdateHandler(ctx *gin.Context) {
 		// Start database transaction
 		err := server.store.ExecTx(ctx, func(q *db.Queries) error {
 			// Read prize
-			prize, err := server.store.GetPrizeByPrizeName(ctx, req.PrizeName)
+			prize, err := q.GetPrizeByPrizeName(ctx, req.PrizeName)
 			if err != nil {
 				if err == sql.ErrNoRows {
 					// If prize_name not exists, return an error
@@ -98,7 +98,7 @@ func (server *Server) manageRolltableUpdateHandler(ctx *gin.Context) {
 				}
 			} else {
 				// If prize exists, delete it
-				err = server.store.DeletePrize(ctx, req.PrizeName)
+				err = q.DeletePrize(ctx, req.PrizeName)
 				if err != nil {
 					return err
 				}
@@ -118,7 +118,7 @@ func (server *Server) manageRolltableUpdateHandler(ctx *gin.Context) {
 		// Start database transaction
 		err := server.store.ExecTx(ctx, func(q *db.Queries) error {
 			// Read prize
-			prize, err := server.store.GetPrizeByPrizeName(ctx, req.PrizeName)
+			prize, err := q.GetPrizeByPrizeName(ctx, req.PrizeName)
 			if err != nil {
 				if err == sql.ErrNoRows {
 					// If prize_name not exists, return an error
@@ -129,7 +129,7 @@ func (server *Server) manageRolltableUpdateHandler(ctx *gin.Context) {
 				}
 			} else {
 				// If prize exists, update it
-				prize, err = server.store.UpdatePrize(ctx, db.UpdatePrizeParams{
+				prize, err = q.UpdatePrize(ctx, db.UpdatePrizeParams{
 					Picpath:   req.PicPath,
 					Weight:    req.Weight,
 					PrizeName: req.PrizeName,
@@ -164,7 +164,7 @@ type manageCatalogUpdateRequest struct {
 	OperatorId int64  `json:"opeatorId"`
 }
 
-/*  Manage Catalog Update PUT handle function */
+/* Manage Catalog Update PUT handle function */
 func (server *Server) manageCatalogUpdateHandler(ctx *gin.Context) {
 	log.Println("================================manageCatalogUpdateHandler: Start================================")
 
@@ -188,7 +188,7 @@ func (server *Server) manageCatalogUpdateHandler(ctx *gin.Context) {
 				return err
 			}
 			// Insert an item in the DB
-			item, err := server.store.CreateItem(ctx, createItemParams)
+			item, err := q.CreateItem(ctx, createItemParams)
 			if err != nil {
 				ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 				return err
@@ -212,7 +212,7 @@ func (server *Server) manageCatalogUpdateHandler(ctx *gin.Context) {
 				return err
 			}
 			// Update the item in the DB
-			item, err := server.store.UpdateItem(ctx, updateItemParams)
+			item, err := q.UpdateItem(ctx, updateItemParams)
 			if err != nil {
 				ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 				return err
@@ -230,7 +230,7 @@ func (server *Server) manageCatalogUpdateHandler(ctx *gin.Context) {
 	log.Println("================================manageCatalogUpdateHandler: End================================")
 }
 
-/*  Manage Catalog DELETE handle function */
+/* Manage Catalog DELETE handle function */
 func (server *Server) manageCatalogDeleteHandler(ctx *gin.Context) {
 	log.Println("================================manageCatalogDeleteHandler: Start================================")
 
@@ -250,7 +250,7 @@ func (server *Server) manageCatalogDeleteHandler(ctx *gin.Context) {
 	// Start database transaction
 	err = server.store.ExecTx(ctx, func(q *db.Queries) error {
 		// Read prize
-		item, err := server.store.GetItem(ctx, itemID)
+		item, err := q.GetItem(ctx, itemID)
 		if err != nil {
 			if err == sql.ErrNoRows {
 				// If item not exists, return an error
@@ -261,7 +261,7 @@ func (server *Server) manageCatalogDeleteHandler(ctx *gin.Context) {
 			}
 		} else {
 			// If prize exists, delete it
-			err = server.store.DeleteItem(ctx, itemID)
+			err = q.DeleteItem(ctx, itemID)
 			if err != nil {
 				return err
 			}
@@ -311,131 +311,55 @@ func (server *Server) manageDiffQueryHandler(ctx *gin.Context) {
 
 /* Manage Diff Update POST received data */
 type manageDiffUpdateRequest struct {
-	Status       string `json:"status"`
-	DiffLV       int32  `json:"diffLV"`
-	AwardDensity int32  `json:"awardDensity"`
-	EnemyDensity int32  `json:"enemyDensity"`
+	DiffLV       int32 `json:"diffLV"`
+	AwardDensity int32 `json:"awardDensity"`
+	EnemyDensity int32 `json:"enemyDensity"`
 }
 
 /*  Manage DiffLv Update POST handle function */
 func (server *Server) manageDiffUpdateHandler(ctx *gin.Context) {
 	log.Println("================================manageDiffUpdateHandler: Start================================")
 
-	var req manageDiffUpdateRequest
+	var reqs []manageDiffUpdateRequest
 
 	// Read frontend data
-	if err := ctx.ShouldBindJSON(&req); err != nil {
+	if err := ctx.ShouldBindJSON(&reqs); err != nil {
 		ctx.JSON(http.StatusBadRequest, errorResponse(err))
 		return
 	}
-	log.Println("diffLV =", req.DiffLV)
+	log.Println("game difficulty settings count =", len(reqs))
 
-	switch req.Status {
-	case "create":
-		// Start database transaction
-		err := server.store.ExecTx(ctx, func(q *db.Queries) error {
-			// Read prize
-			diffLv, err := server.store.ListGameDiffSetsByDiffLv(ctx, req.DiffLV)
-			if err != nil {
-				if err == sql.ErrNoRows {
-					// If diffLv not exists, create it
-					diffLv, err = server.store.CreateDiffLv(ctx, db.CreateDiffLvParams{
-						DiffLv:       req.DiffLV,
-						AwardDensity: req.AwardDensity,
-						EnemyDensity: req.EnemyDensity,
-					})
-					if err != nil {
-						return err
-					}
-					log.Println("diffLv Created")
-				} else {
-					return err
-				}
-			} else {
-				// If diffLv exists, return err
-				ctx.JSON(http.StatusConflict, errorCustomResponse("This diffLv has already been created!"))
-				return nil
-			}
-
-			ctx.JSON(http.StatusOK, diffLv)
-			return nil
-		})
-		// Return response
+	// Start database transaction
+	err := server.store.ExecTx(ctx, func(q *db.Queries) error {
+		// Delete all game difficulty settings
+		err := q.DeleteAllGameDiffSets(ctx)
 		if err != nil {
 			ctx.JSON(http.StatusInternalServerError, errorResponse(err))
-			return
+			return err
 		}
+		log.Println("All game difficulty settings deleted")
 
-	case "delete":
-		// Start database transaction
-		err := server.store.ExecTx(ctx, func(q *db.Queries) error {
-			// Read prize
-			diffLv, err := server.store.ListGameDiffSetsByDiffLv(ctx, req.DiffLV)
+		// Insert every new game difficulty settings
+		for _, req := range reqs {
+			log.Printf("DiffLV=[%d],AwardDensity=[%d],EnemyDensity[%d]", req.DiffLV, req.AwardDensity, req.EnemyDensity)
+			gameDiffSetting, err := q.CreateDiffLv(ctx, db.CreateDiffLvParams{
+				DiffLv:       req.DiffLV,
+				AwardDensity: req.AwardDensity,
+				EnemyDensity: req.EnemyDensity,
+			})
 			if err != nil {
-				if err == sql.ErrNoRows {
-					// If diffLv not exists, return an error
-					ctx.JSON(http.StatusConflict, errorCustomResponse("This diffLv has not been created!"))
-					return nil
-				} else {
-					return err
-				}
-			} else {
-				// If diffLv exists, delete it
-				err = server.store.DeleteDiffLv(ctx, db.DeleteDiffLvParams{
-					DiffLv:       req.DiffLV,
-					AwardDensity: req.AwardDensity,
-					EnemyDensity: req.EnemyDensity,
-				})
-				if err != nil {
-					return err
-				}
-				log.Println("Prize Deleted")
+				ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+				return err
 			}
-
-			ctx.JSON(http.StatusOK, diffLv)
-			return nil
-		})
-		// Return response
-		if err != nil {
-			ctx.JSON(http.StatusInternalServerError, errorResponse(err))
-			return
+			log.Printf("game difficulty settings inserted: [%d]-[%d]-[%d]", gameDiffSetting.DiffLv, gameDiffSetting.AwardDensity, gameDiffSetting.EnemyDensity)
 		}
 
-	case "update":
-		// Start database transaction
-		err := server.store.ExecTx(ctx, func(q *db.Queries) error {
-			// Read prize
-			diffLv, err := server.store.ListGameDiffSetsByDiffLv(ctx, req.DiffLV)
-			if err != nil {
-				if err == sql.ErrNoRows {
-					// If diffLv not exists, return an error
-					ctx.JSON(http.StatusConflict, errorCustomResponse("This diffLv has not been created!"))
-					return nil
-				} else {
-					return err
-				}
-			} else {
-				// If diffLv exists, update it
-				diffLv, err = server.store.UpdateDiffLv(ctx, db.UpdateDiffLvParams{
-					DiffLv:       req.DiffLV,
-					Awarddensity: req.AwardDensity,
-					Enemydensity: req.EnemyDensity,
-				})
-				if err != nil {
-					return err
-				}
-				log.Println("DiffLv Updated")
-			}
+		ctx.JSON(http.StatusOK, nil)
+		return nil
+	})
 
-			ctx.JSON(http.StatusOK, diffLv)
-			return nil
-		})
-		// Return response
-		if err != nil {
-			ctx.JSON(http.StatusInternalServerError, errorResponse(err))
-			return
-		}
-
-		log.Println("================================manageDiffUpdateHandler: End================================")
+	if err != nil {
+		return
 	}
+	log.Println("================================manageDiffUpdateHandler: End================================")
 }

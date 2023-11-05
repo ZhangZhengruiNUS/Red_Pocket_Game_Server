@@ -80,11 +80,11 @@ func (server *Server) signupHandler(ctx *gin.Context) {
 	// Start database transaction
 	err := server.store.ExecTx(ctx, func(q *db.Queries) error {
 		// Read user
-		user, err := server.store.GetUserByName(ctx, req.UserName)
+		user, err := q.GetUserByName(ctx, req.UserName)
 		if err != nil {
 			if err == sql.ErrNoRows {
 				// If username not exists, create it
-				user, err = server.store.CreateUser(ctx, db.CreateUserParams{
+				user, err = q.CreateUser(ctx, db.CreateUserParams{
 					UserName: req.UserName,
 					Password: req.Password,
 					RoleType: 0,
