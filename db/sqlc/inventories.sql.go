@@ -113,6 +113,60 @@ func (q *Queries) ListInventoriesByUserID(ctx context.Context, arg ListInventori
 	return items, nil
 }
 
+const listWarehouse02ByUserID = `-- name: ListWarehouse02ByUserID :many
+SELECT t1.item_id, COALESCE(t2.item_name, ' '), COALESCE(t2.describe, ' '), t1.quantity, COALESCE(t2.price, 0), COALESCE(t2.pic_path, ' ')  FROM inventories t1
+LEFT JOIN items t2 ON t1.item_id = t2.item_id
+WHERE user_id = $3
+ORDER BY t1.item_id
+LIMIT $1
+OFFSET $2
+`
+
+type ListWarehouse02ByUserIDParams struct {
+	Limit  int32 `json:"limit"`
+	Offset int32 `json:"offset"`
+	UserID int64 `json:"userId"`
+}
+
+type ListWarehouse02ByUserIDRow struct {
+	ItemID   int64  `json:"itemId"`
+	ItemName string `json:"itemName"`
+	Describe string `json:"describe"`
+	Quantity int32  `json:"quantity"`
+	Price    int32  `json:"price"`
+	PicPath  string `json:"picPath"`
+}
+
+func (q *Queries) ListWarehouse02ByUserID(ctx context.Context, arg ListWarehouse02ByUserIDParams) ([]ListWarehouse02ByUserIDRow, error) {
+	rows, err := q.query(ctx, q.listWarehouse02ByUserIDStmt, listWarehouse02ByUserID, arg.Limit, arg.Offset, arg.UserID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []ListWarehouse02ByUserIDRow{}
+	for rows.Next() {
+		var i ListWarehouse02ByUserIDRow
+		if err := rows.Scan(
+			&i.ItemID,
+			&i.ItemName,
+			&i.Describe,
+			&i.Quantity,
+			&i.Price,
+			&i.PicPath,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const updateInventoryQuantity = `-- name: UpdateInventoryQuantity :one
 UPDATE inventories
 SET quantity = quantity + $1

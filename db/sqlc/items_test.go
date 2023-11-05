@@ -77,12 +77,14 @@ func TestItem(t *testing.T) {
 
 	// // Updata item5
 	// item5.ItemName = util.RandomString(20)
-	// item5.Describe = util.RandomInt32(10, 1000)
-	// item5.Price =
-	// item5.PicPath
+	// item5.Describe = util.RandomString(20)
+	// item5.Price = util.RandomInt32(10, 1000)
+	// item5.PicPath = util.RandomString(20)
+	// item5.ReviserID.Int64 = util.RandomInt64(10, 1000)
+	// item5.ReviserID.Valid = true
 
 	// // Updata test data in the DB
-	// gameDiff5Updated, err := updateGameDiff(testQueries, UpdateDiffLvParams{
+	// gameDiff5Updated, err := updateItem(testQueries, UpdateDiffLvParams{
 	// 	DiffLv:       gameDiff5.DiffLv,
 	// 	Awarddensity: gameDiff5.AwardDensity,
 	// 	Enemydensity: gameDiff5.EnemyDensity,

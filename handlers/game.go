@@ -19,8 +19,6 @@ func (server *Server) gameDiffHandler(ctx *gin.Context) {
 	params := db.ListGameDiffSetsParams{
 		Page:     1,    //start record page
 		Pagesize: 1000, //return record quantity
-<<<<<<< HEAD
-=======
 	}
 
 	// Read & Check input data
@@ -41,7 +39,6 @@ func (server *Server) gameDiffHandler(ctx *gin.Context) {
 	if err != nil {
 		ctx.JSON(httpStatus, errorResponse(err))
 		return
->>>>>>> main
 	}
 
 	// Get data from database

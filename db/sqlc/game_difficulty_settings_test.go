@@ -54,20 +54,16 @@ func TestGameDiffSettings(t *testing.T) {
 		require.NoError(t, err)
 	}()
 
-	// Get a userID for creating new diffLv
-	userID, err := getFirstUserIDFromDB(testQueries)
-	require.NoError(t, err)
-
 	// Create test data in the DB
-	gameDiff1, err = insertRandomGameDiffWithCreatorID(testQueries, userID)
+	gameDiff1, err = insertRandomGameDiffWithCreatorID(testQueries)
 	require.NoError(t, err)
-	gameDiff2, err = insertRandomGameDiffWithCreatorID(testQueries, userID)
+	gameDiff2, err = insertRandomGameDiffWithCreatorID(testQueries)
 	require.NoError(t, err)
-	gameDiff3, err = insertRandomGameDiffWithCreatorID(testQueries, userID)
+	gameDiff3, err = insertRandomGameDiffWithCreatorID(testQueries)
 	require.NoError(t, err)
-	gameDiff4, err = insertRandomGameDiffWithCreatorID(testQueries, userID)
+	gameDiff4, err = insertRandomGameDiffWithCreatorID(testQueries)
 	require.NoError(t, err)
-	gameDiff5, err = insertRandomGameDiffWithCreatorID(testQueries, userID)
+	gameDiff5, err = insertRandomGameDiffWithCreatorID(testQueries)
 	require.NoError(t, err)
 
 	gameDiff := []GameDifficultySetting{
@@ -103,7 +99,7 @@ func TestGameDiffSettings(t *testing.T) {
 	gameDiff5.EnemyDensity = util.RandomInt32(10, 1000)
 
 	// Updata test data in the DB
-	gameDiff5Updated, err := updateGameDiff(testQueries, UpdateDiffLvParams{
+	gameDiff5Updated, err := testQueries.UpdateDiffLv(context.Background(), UpdateDiffLvParams{
 		DiffLv:       gameDiff5.DiffLv,
 		Awarddensity: gameDiff5.AwardDensity,
 		Enemydensity: gameDiff5.EnemyDensity,

@@ -103,6 +103,18 @@ func (q *Queries) GetUserByName(ctx context.Context, userName string) (User, err
 	return i, err
 }
 
+const listCouponByUserID = `-- name: ListCouponByUserID :one
+SELECT coupon FROM users
+WHERE user_id = $1 LIMIT 1
+`
+
+func (q *Queries) ListCouponByUserID(ctx context.Context, userID int64) (int32, error) {
+	row := q.queryRow(ctx, q.listCouponByUserIDStmt, listCouponByUserID, userID)
+	var coupon int32
+	err := row.Scan(&coupon)
+	return coupon, err
+}
+
 const listUsers = `-- name: ListUsers :many
 SELECT user_id, user_name, password, credit, coupon, role_type, create_time FROM users
 ORDER BY user_id
@@ -144,6 +156,42 @@ func (q *Queries) ListUsers(ctx context.Context, arg ListUsersParams) ([]User, e
 		return nil, err
 	}
 	return items, nil
+}
+
+const listWarehouse01ByUserID = `-- name: ListWarehouse01ByUserID :one
+SELECT credit, coupon FROM users
+WHERE user_id = $1 LIMIT 1
+`
+
+type ListWarehouse01ByUserIDRow struct {
+	Credit int32 `json:"credit"`
+	Coupon int32 `json:"coupon"`
+}
+
+func (q *Queries) ListWarehouse01ByUserID(ctx context.Context, userID int64) (ListWarehouse01ByUserIDRow, error) {
+	row := q.queryRow(ctx, q.listWarehouse01ByUserIDStmt, listWarehouse01ByUserID, userID)
+	var i ListWarehouse01ByUserIDRow
+	err := row.Scan(&i.Credit, &i.Coupon)
+	return i, err
+}
+
+const updateCoupon = `-- name: UpdateCoupon :one
+UPDATE users
+SET coupon = coupon + $1
+WHERE user_id = $2
+RETURNING coupon
+`
+
+type UpdateCouponParams struct {
+	Amount int32 `json:"amount"`
+	UserID int64 `json:"userId"`
+}
+
+func (q *Queries) UpdateCoupon(ctx context.Context, arg UpdateCouponParams) (int32, error) {
+	row := q.queryRow(ctx, q.updateCouponStmt, updateCoupon, arg.Amount, arg.UserID)
+	var coupon int32
+	err := row.Scan(&coupon)
+	return coupon, err
 }
 
 const updateUserCoupon = `-- name: UpdateUserCoupon :one
