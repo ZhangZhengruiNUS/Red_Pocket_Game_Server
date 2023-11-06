@@ -24,7 +24,7 @@ func (m *CatalogModule) RegisterRoutes(server *Server, router *gin.Engine) {
 
 /* Catalog GET handle function */
 func (server *Server) catalogHandler(ctx *gin.Context) {
-	log.Println("================================catalogHandler: Start================================")
+	log.Println("test================================catalogHandler: Start================================")
 
 	// Initialize query parameters
 	params := db.ListItemsParams{
