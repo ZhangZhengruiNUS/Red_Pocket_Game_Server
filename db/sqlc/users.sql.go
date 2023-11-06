@@ -41,14 +41,43 @@ func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, e
 	return i, err
 }
 
-const deleteUser = `-- name: DeleteUser :exec
-DELETE FROM users
-WHERE user_id = $1
+const createUserByUserId = `-- name: CreateUserByUserId :one
+INSERT INTO users (
+  user_id,
+  user_name,
+  password,
+  role_type
+) VALUES (
+  $1, $2, $3, $4
+)
+RETURNING user_id, user_name, password, credit, coupon, role_type, create_time
 `
 
-func (q *Queries) DeleteUser(ctx context.Context, userID int64) error {
-	_, err := q.exec(ctx, q.deleteUserStmt, deleteUser, userID)
-	return err
+type CreateUserByUserIdParams struct {
+	UserID   int64  `json:"userId"`
+	UserName string `json:"userName"`
+	Password string `json:"password"`
+	RoleType int32  `json:"roleType"`
+}
+
+func (q *Queries) CreateUserByUserId(ctx context.Context, arg CreateUserByUserIdParams) (User, error) {
+	row := q.queryRow(ctx, q.createUserByUserIdStmt, createUserByUserId,
+		arg.UserID,
+		arg.UserName,
+		arg.Password,
+		arg.RoleType,
+	)
+	var i User
+	err := row.Scan(
+		&i.UserID,
+		&i.UserName,
+		&i.Password,
+		&i.Credit,
+		&i.Coupon,
+		&i.RoleType,
+		&i.CreateTime,
+	)
+	return i, err
 }
 
 const getAverageCouponCount = `-- name: GetAverageCouponCount :one
