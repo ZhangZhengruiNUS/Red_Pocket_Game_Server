@@ -3,6 +3,9 @@ package db
 import (
 	"Red_Pocket_Game_Server/util"
 	"context"
+	"database/sql"
+	"log"
+	"strconv"
 )
 
 // Insert a random item, but specific CreatorID in the DB
@@ -59,35 +62,28 @@ func insertRandomPrizeWithCreatorID(testQueries *Queries) (Prize, error) {
 	})
 }
 
-// // Check or create a user with user_id == -1 to ensure foreign key constraints
-// func checkOrCreateUserIdMinusOne(testQueries *Queries) error {
-// 	// Check any user with user_id == -1
-// 	_, err := testQueries.GetUserById(context.Background(), -1)
-// 	if err != nil {
-// 		if err == sql.ErrNoRows {
-// 			// If no user with user_id == -1, create one
-// 			user, err := testQueries.CreateUser(context.Background(), CreateUserParams{
-
-// 				UserName: "admin",
-// 				Password: "admin",
-// 				RoleType: 1,
-// 			})
-// 			return nil
-// 		} else {
-// 			return err
-// 		}
-// 	}
-// 	// If no user in the DB, then create one
-// 	if len(users) == 0 {
-// 		user, err := testQueries.CreateUser(context.Background(), CreateUserParams{
-// 			UserName: "admin",
-// 			Password: "admin",
-// 			RoleType: 1,
-// 		})
-// 		if err != nil {
-// 			return 0, err
-// 		}
-// 		return user.UserID, nil
-// 	}
-// 	return users[0].UserID, nil
-// }
+// Check or create a user with user_id == -1 to ensure foreign key constraints
+func checkOrCreateUserIdMinusOne(testQueries *Queries) error {
+	// var exist bool = false
+	// Check any user with user_id == -1
+	_, err := testQueries.GetUserById(context.Background(), -1)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			// If no user with user_id == -1, create one
+			user, err := testQueries.CreateUserByUserId(context.Background(), CreateUserByUserIdParams{
+				UserID:   -1,
+				UserName: util.RandomString(20),
+				Password: util.RandomString(20),
+				RoleType: 1,
+			})
+			if err != nil {
+				return err
+			}
+			log.Println("No user with user_id ==" + strconv.FormatInt(user.UserID, 10) + ", create one")
+		} else {
+			// exist = true
+			return err
+		}
+	}
+	return nil
+}

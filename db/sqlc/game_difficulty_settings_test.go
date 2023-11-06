@@ -20,6 +20,10 @@ func TestGameDiffSettings(t *testing.T) {
 	var gameDiff5 GameDifficultySetting
 	var err error
 
+	// Check or create a user with user_id == -1 to ensure foreign key constraints
+	err = checkOrCreateUserIdMinusOne(testQueries)
+	require.NoError(t, err)
+
 	// Delete test data when testing ends
 	defer func() {
 		err = testQueries.DeleteDiffLv(context.Background(), DeleteDiffLvParams{
@@ -52,6 +56,9 @@ func TestGameDiffSettings(t *testing.T) {
 			EnemyDensity: gameDiff5.EnemyDensity,
 		})
 		require.NoError(t, err)
+
+		// Delete the user with user_id == -1 created when testing
+		// No time to implement it
 	}()
 
 	// Create test data in the DB

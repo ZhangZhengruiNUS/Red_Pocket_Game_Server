@@ -39,6 +39,9 @@ func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 	if q.createUserStmt, err = db.PrepareContext(ctx, createUser); err != nil {
 		return nil, fmt.Errorf("error preparing query CreateUser: %w", err)
 	}
+	if q.createUserByUserIdStmt, err = db.PrepareContext(ctx, createUserByUserId); err != nil {
+		return nil, fmt.Errorf("error preparing query CreateUserByUserId: %w", err)
+	}
 	if q.deleteDiffLvStmt, err = db.PrepareContext(ctx, deleteDiffLv); err != nil {
 		return nil, fmt.Errorf("error preparing query DeleteDiffLv: %w", err)
 	}
@@ -47,9 +50,6 @@ func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 	}
 	if q.deletePrizeStmt, err = db.PrepareContext(ctx, deletePrize); err != nil {
 		return nil, fmt.Errorf("error preparing query DeletePrize: %w", err)
-	}
-	if q.deleteUserStmt, err = db.PrepareContext(ctx, deleteUser); err != nil {
-		return nil, fmt.Errorf("error preparing query DeleteUser: %w", err)
 	}
 	if q.getAverageCouponCountStmt, err = db.PrepareContext(ctx, getAverageCouponCount); err != nil {
 		return nil, fmt.Errorf("error preparing query GetAverageCouponCount: %w", err)
@@ -150,6 +150,11 @@ func (q *Queries) Close() error {
 			err = fmt.Errorf("error closing createUserStmt: %w", cerr)
 		}
 	}
+	if q.createUserByUserIdStmt != nil {
+		if cerr := q.createUserByUserIdStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing createUserByUserIdStmt: %w", cerr)
+		}
+	}
 	if q.deleteDiffLvStmt != nil {
 		if cerr := q.deleteDiffLvStmt.Close(); cerr != nil {
 			err = fmt.Errorf("error closing deleteDiffLvStmt: %w", cerr)
@@ -163,11 +168,6 @@ func (q *Queries) Close() error {
 	if q.deletePrizeStmt != nil {
 		if cerr := q.deletePrizeStmt.Close(); cerr != nil {
 			err = fmt.Errorf("error closing deletePrizeStmt: %w", cerr)
-		}
-	}
-	if q.deleteUserStmt != nil {
-		if cerr := q.deleteUserStmt.Close(); cerr != nil {
-			err = fmt.Errorf("error closing deleteUserStmt: %w", cerr)
 		}
 	}
 	if q.getAverageCouponCountStmt != nil {
@@ -329,10 +329,10 @@ type Queries struct {
 	createItemStmt                 *sql.Stmt
 	createPrizeStmt                *sql.Stmt
 	createUserStmt                 *sql.Stmt
+	createUserByUserIdStmt         *sql.Stmt
 	deleteDiffLvStmt               *sql.Stmt
 	deleteItemStmt                 *sql.Stmt
 	deletePrizeStmt                *sql.Stmt
-	deleteUserStmt                 *sql.Stmt
 	getAverageCouponCountStmt      *sql.Stmt
 	getInventoryByUserIDItemIDStmt *sql.Stmt
 	getItemStmt                    *sql.Stmt
@@ -367,10 +367,10 @@ func (q *Queries) WithTx(tx *sql.Tx) *Queries {
 		createItemStmt:                 q.createItemStmt,
 		createPrizeStmt:                q.createPrizeStmt,
 		createUserStmt:                 q.createUserStmt,
+		createUserByUserIdStmt:         q.createUserByUserIdStmt,
 		deleteDiffLvStmt:               q.deleteDiffLvStmt,
 		deleteItemStmt:                 q.deleteItemStmt,
 		deletePrizeStmt:                q.deletePrizeStmt,
-		deleteUserStmt:                 q.deleteUserStmt,
 		getAverageCouponCountStmt:      q.getAverageCouponCountStmt,
 		getInventoryByUserIDItemIDStmt: q.getInventoryByUserIDItemIDStmt,
 		getItemStmt:                    q.getItemStmt,

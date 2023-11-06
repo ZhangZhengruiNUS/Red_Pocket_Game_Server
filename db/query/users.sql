@@ -12,6 +12,17 @@ ORDER BY user_id
 LIMIT sqlc.arg(pageSize)::int
 OFFSET ((sqlc.arg(page)::int - 1) * sqlc.arg(pageSize)::int);
 
+-- name: CreateUserByUserId :one
+INSERT INTO users (
+  user_id,
+  user_name,
+  password,
+  role_type
+) VALUES (
+  $1, $2, $3, $4
+)
+RETURNING *;
+
 -- name: CreateUser :one
 INSERT INTO users (
   user_name,
@@ -21,10 +32,6 @@ INSERT INTO users (
   $1, $2, $3
 )
 RETURNING *;
-
--- name: DeleteUser :exec
-DELETE FROM users
-WHERE user_id = $1;
 
 -- name: UpdateUserCredit :one
 UPDATE users
