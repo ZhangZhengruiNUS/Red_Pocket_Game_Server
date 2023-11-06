@@ -2,19 +2,15 @@ package server
 
 import db "Red_Pocket_Game_Server/db/sqlc"
 
-// Adjust Game Setting
-func adjustGameSetting(strategy ExtraDifficultyStrategy, gameDifficultySettings []db.GameDifficultySetting) {
-	strategy.AdjustGameSetting(gameDifficultySettings)
+// Extra difficulty strategy interface
+type ExtraDifficultyStrategy interface {
+	AdjustGameSetting(gameDifficultySettings []db.GameDifficultySetting)
 }
 
 type NormalDiffStrategy struct{}
 
 // Hard game difficulty game setting
 func (h NormalDiffStrategy) AdjustGameSetting(gameDifficultySettings []db.GameDifficultySetting) {}
-
-type ExtraDifficultyStrategy interface {
-	AdjustGameSetting(gameDifficultySettings []db.GameDifficultySetting)
-}
 
 type EasyDiffStrategy struct{}
 
@@ -43,4 +39,9 @@ func (h HardDiffStrategy) AdjustGameSetting(gameDifficultySettings []db.GameDiff
 		}
 		gameDifficultySettings[index].EnemyDensity = enemyDensity + 1
 	}
+}
+
+// Adjust Game Setting
+func adjustGameSetting(strategy ExtraDifficultyStrategy, gameDifficultySettings []db.GameDifficultySetting) {
+	strategy.AdjustGameSetting(gameDifficultySettings)
 }

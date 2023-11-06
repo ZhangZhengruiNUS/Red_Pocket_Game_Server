@@ -6,65 +6,45 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// server serves HTTP requests
+// Module route register
+type Module interface {
+	RegisterRoutes(server *Server, router *gin.Engine)
+}
+
+// Serves HTTP requests
 type Server struct {
 	store  *db.Store
 	router *gin.Engine
 }
 
-// creates a new HTTP server and setup routing
+// Creates a new HTTP server and setup routing
 func NewServer(store *db.Store) *Server {
-	server := &Server{store: store}
-	router := gin.Default()
-	router.Use(corsMiddleware())
+	// Initialize server
+	server := &Server{
+		store:  store,
+		router: gin.Default(),
+	}
 
-	router.POST("/login", server.loginHandler)
+	// Add middleware
+	addMiddlewares(server.router)
 
-	router.POST("/signup", server.signupHandler)
+	// Add routes
+	var modules []Module = []Module{
+		&CatalogModule{},
+		&GameModule{},
+		&ManageModule{},
+		&UserModule{},
+		&WarehouseModule{},
+	}
+	for _, module := range modules {
+		module.RegisterRoutes(server, server.router)
+	}
 
-	router.GET("/catalog", server.catalogHandler)
-	router.GET("/catalog/user", server.catalogUserHandler)
-	router.POST("/catalog/buy", server.catalogBuyHandler)
-
-	router.GET("/game/diff", server.gameDiffHandler)
-	router.GET("/game/equip", server.gameEquipQueryHandler)
-	router.POST("/game/equip", server.gameEquipUpdateHandler)
-	router.POST("/game/end", server.gameEndHandler)
-
-	router.GET("/warehouse", server.warehouseInfoQueryHandler)
-	router.GET("/warehouse/rolltable", server.warehouseRolltableQueryHandler)
-	router.POST("/warehouse/rolltable", server.warehouseRolltableUpdateHandler)
-
-	router.GET("/manage/rolltable", server.warehouseRolltableQueryHandler)
-	router.POST("/manage/rolltable", server.manageRolltableUpdateHandler)
-	router.GET("/manage/catalog", server.catalogHandler)
-	router.PUT("/manage/catalog", server.manageCatalogUpdateHandler)
-	router.DELETE("/manage/catalog", server.manageCatalogDeleteHandler)
-	router.GET("/manage/diff", server.manageDiffQueryHandler)
-	router.POST("/manage/diff", server.manageDiffUpdateHandler)
-
-	server.router = router
+	// Return server
 	return server
 }
 
-// start runs the HTTP server
+// Start HTTP server
 func (server *Server) Start(address string) error {
 	return server.router.Run(address)
-}
-
-// cors middleware
-func corsMiddleware() gin.HandlerFunc {
-	return func(c *gin.Context) {
-		c.Writer.Header().Set("Access-Control-Allow-Origin", "*")
-		c.Writer.Header().Set("Access-Control-Allow-Credentials", "true")
-		c.Writer.Header().Set("Access-Control-Allow-Headers", "Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization, accept, origin, Cache-Control, X-Requested-With")
-		c.Writer.Header().Set("Access-Control-Allow-Methods", "POST, DELETE, GET, PUT, OPTIONS")
-
-		if c.Request.Method == "OPTIONS" {
-			c.AbortWithStatus(204)
-			return
-		}
-
-		c.Next()
-	}
 }

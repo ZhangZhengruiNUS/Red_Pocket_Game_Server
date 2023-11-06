@@ -10,6 +10,18 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+/* CatalogModule */
+type CatalogModule struct{}
+
+func (m *CatalogModule) RegisterRoutes(server *Server, router *gin.Engine) {
+	users := router.Group("/catalog")
+	{
+		users.GET("", server.catalogHandler)
+		users.GET("/user", server.catalogUserHandler)
+		users.POST("/buy", server.catalogBuyHandler)
+	}
+}
+
 /* Catalog GET handle function */
 func (server *Server) catalogHandler(ctx *gin.Context) {
 	log.Println("================================catalogHandler: Start================================")
@@ -57,14 +69,14 @@ func (server *Server) catalogBuyHandler(ctx *gin.Context) {
 	// Start database transaction
 	err := server.store.ExecTx(ctx, func(q *db.Queries) error {
 		// Read user's credit
-		user, err := server.store.GetUserById(ctx, req.UserID)
+		user, err := q.GetUserById(ctx, req.UserID)
 		if err != nil {
 			return err
 		}
 		log.Println("user.Credit=", user.Credit)
 
 		// Read item's price
-		item, err := server.store.GetItem(ctx, req.ItemID)
+		item, err := q.GetItem(ctx, req.ItemID)
 		if err != nil {
 			return err
 		}
@@ -77,7 +89,7 @@ func (server *Server) catalogBuyHandler(ctx *gin.Context) {
 		}
 
 		// Update user's credit
-		user, err = server.store.UpdateUserCredit(ctx, db.UpdateUserCreditParams{
+		user, err = q.UpdateUserCredit(ctx, db.UpdateUserCreditParams{
 			Amount: -item.Price,
 			UserID: user.UserID,
 		})
@@ -87,14 +99,14 @@ func (server *Server) catalogBuyHandler(ctx *gin.Context) {
 		log.Println("Updated user.Credit=", user.Credit)
 
 		// Read inventory
-		inventory, err := server.store.GetInventoryByUserIDItemID(ctx, db.GetInventoryByUserIDItemIDParams{
+		inventory, err := q.GetInventoryByUserIDItemID(ctx, db.GetInventoryByUserIDItemIDParams{
 			UserID: user.UserID,
 			ItemID: item.ItemID,
 		})
 		if err != nil {
 			if err == sql.ErrNoRows {
 				// If inventory not exists, create it
-				inventory, err = server.store.CreateInventory(ctx, db.CreateInventoryParams{
+				inventory, err = q.CreateInventory(ctx, db.CreateInventoryParams{
 					UserID:   user.UserID,
 					ItemID:   item.ItemID,
 					Quantity: 1,
@@ -108,7 +120,7 @@ func (server *Server) catalogBuyHandler(ctx *gin.Context) {
 			}
 		} else {
 			// If inventory exists, update inventory's quantity
-			inventory, err = server.store.UpdateInventoryQuantity(ctx, db.UpdateInventoryQuantityParams{
+			inventory, err = q.UpdateInventoryQuantity(ctx, db.UpdateInventoryQuantityParams{
 				Amount: 1,
 				UserID: inventory.UserID,
 				ItemID: inventory.ItemID,

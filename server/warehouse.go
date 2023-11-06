@@ -9,6 +9,18 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+/* WarehouseModule */
+type WarehouseModule struct{}
+
+func (m *WarehouseModule) RegisterRoutes(server *Server, router *gin.Engine) {
+	users := router.Group("/warehouse")
+	{
+		users.GET("", server.warehouseInfoQueryHandler)
+		users.GET("/rolltable", server.warehouseRolltableQueryHandler)
+		users.POST("/rolltable", server.warehouseRolltableUpdateHandler)
+	}
+}
+
 /* Warehouse GET handle function */
 func (server *Server) warehouseInfoQueryHandler(ctx *gin.Context) {
 	fmt.Println("================================warehouseQueryHandler: Start================================")

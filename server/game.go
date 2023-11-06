@@ -11,7 +11,20 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-/* Came-diff GET handle function */
+/* GameModule */
+type GameModule struct{}
+
+func (m *GameModule) RegisterRoutes(server *Server, router *gin.Engine) {
+	users := router.Group("/game")
+	{
+		users.GET("/diff", server.gameDiffHandler)
+		users.GET("/equip", server.gameEquipQueryHandler)
+		users.POST("/equip", server.gameEquipUpdateHandler)
+		users.POST("/end", server.gameEndHandler)
+	}
+}
+
+/* Game-diff GET handle function */
 func (server *Server) gameDiffHandler(ctx *gin.Context) {
 	log.Println("================================gameDiffHandler: Start================================")
 
@@ -125,7 +138,7 @@ func (server *Server) gameEquipUpdateHandler(ctx *gin.Context) {
 	// Start database transaction
 	err := server.store.ExecTx(ctx, func(q *db.Queries) error {
 		// Read user
-		_, err := server.store.GetUserById(ctx, req.UserID)
+		_, err := q.GetUserById(ctx, req.UserID)
 		if err != nil {
 			if err == sql.ErrNoRows {
 				// If userID not exists, return err
@@ -140,7 +153,7 @@ func (server *Server) gameEquipUpdateHandler(ctx *gin.Context) {
 		// Iterate ItemIDs
 		for i := 0; i < len(req.ItemIDs); i++ {
 			// Read inventory
-			inventory, err := server.store.GetInventoryByUserIDItemID(ctx, db.GetInventoryByUserIDItemIDParams{
+			inventory, err := q.GetInventoryByUserIDItemID(ctx, db.GetInventoryByUserIDItemIDParams{
 				UserID: req.UserID,
 				ItemID: req.ItemIDs[i],
 			})
@@ -164,7 +177,7 @@ func (server *Server) gameEquipUpdateHandler(ctx *gin.Context) {
 			}
 
 			// Update user's inventories
-			inventory, err = server.store.UpdateInventoryQuantity(ctx, db.UpdateInventoryQuantityParams{
+			inventory, err = q.UpdateInventoryQuantity(ctx, db.UpdateInventoryQuantityParams{
 				Amount: -1,
 				UserID: inventory.UserID,
 				ItemID: inventory.ItemID,
@@ -213,7 +226,7 @@ func (server *Server) gameEndHandler(ctx *gin.Context) {
 	// Start database transaction
 	err := server.store.ExecTx(ctx, func(q *db.Queries) error {
 		// Read user
-		user, err := server.store.GetUserById(ctx, req.UserID)
+		user, err := q.GetUserById(ctx, req.UserID)
 		if err != nil {
 			if err == sql.ErrNoRows {
 				// If userID not exists, return err
@@ -226,7 +239,7 @@ func (server *Server) gameEndHandler(ctx *gin.Context) {
 		}
 
 		// Update user's Credit
-		user, err = server.store.UpdateUserCredit(ctx, db.UpdateUserCreditParams{
+		user, err = q.UpdateUserCredit(ctx, db.UpdateUserCreditParams{
 			Amount: req.Credit,
 			UserID: req.UserID,
 		})
@@ -236,7 +249,7 @@ func (server *Server) gameEndHandler(ctx *gin.Context) {
 		log.Println("Updated user.Credit=", user.Credit)
 
 		// Update user's Coupon
-		user, err = server.store.UpdateUserCoupon(ctx, db.UpdateUserCouponParams{
+		user, err = q.UpdateUserCoupon(ctx, db.UpdateUserCouponParams{
 			Amount: req.Coupon,
 			UserID: req.UserID,
 		})

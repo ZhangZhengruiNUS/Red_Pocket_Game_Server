@@ -8,5 +8,5 @@ spec:
     kind: Deployment
     name: red-pocket-game-deployment
   minReplicas: 2
-  maxReplicas: 5
+  maxReplicas: 6
   targetCPUUtilizationPercentage: 50

@@ -18,10 +18,6 @@ func TestPrize(t *testing.T) {
 	var prize5 Prize
 	var err error
 
-	// Check or create a user with user_id == -1 to ensure foreign key constraints
-	err = checkOrCreateUserIdMinusOne(testQueries)
-	require.NoError(t, err)
-
 	// Delete test data when testing ends
 	defer func() {
 		err = testQueries.DeletePrize(context.Background(), prize1.PrizeName)
