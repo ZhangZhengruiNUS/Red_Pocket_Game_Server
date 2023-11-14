@@ -7,14 +7,14 @@ type ExtraDifficultyStrategy interface {
 	AdjustGameSetting(gameDifficultySettings []db.GameDifficultySetting)
 }
 
+/* Normal game difficulty setting */
 type NormalDiffStrategy struct{}
 
-// Hard game difficulty game setting
 func (h NormalDiffStrategy) AdjustGameSetting(gameDifficultySettings []db.GameDifficultySetting) {}
 
+/* Easy game difficulty setting  */
 type EasyDiffStrategy struct{}
 
-// Easy game difficulty setting
 func (e EasyDiffStrategy) AdjustGameSetting(gameDifficultySettings []db.GameDifficultySetting) {
 	for index := range gameDifficultySettings {
 		awardDensity := gameDifficultySettings[index].AwardDensity
@@ -27,9 +27,9 @@ func (e EasyDiffStrategy) AdjustGameSetting(gameDifficultySettings []db.GameDiff
 	}
 }
 
+/* Hard game difficulty setting */
 type HardDiffStrategy struct{}
 
-// Hard game difficulty game setting
 func (h HardDiffStrategy) AdjustGameSetting(gameDifficultySettings []db.GameDifficultySetting) {
 	for index := range gameDifficultySettings {
 		awardDensity := gameDifficultySettings[index].AwardDensity
@@ -39,9 +39,4 @@ func (h HardDiffStrategy) AdjustGameSetting(gameDifficultySettings []db.GameDiff
 		}
 		gameDifficultySettings[index].EnemyDensity = enemyDensity + 1
 	}
-}
-
-// Adjust Game Setting
-func adjustGameSetting(strategy ExtraDifficultyStrategy, gameDifficultySettings []db.GameDifficultySetting) {
-	strategy.AdjustGameSetting(gameDifficultySettings)
 }

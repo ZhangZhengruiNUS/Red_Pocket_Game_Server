@@ -50,7 +50,7 @@ func TestItem(t *testing.T) {
 	// Call ListItems for OK
 	productList, err := testQueries.ListItems(context.Background(), ListItemsParams{
 		Page:     2,
-		Pagesize: 2,
+		Pagesize: 3,
 	})
 	// Check ListItems for OK
 	require.NoError(t, err)
